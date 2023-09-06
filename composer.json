@@ -10,6 +10,10 @@
         {
             "name": "dimitri-rutz",
             "email": "dimitri.rutz@eduvaud.ch"
+        },
+        {
+            "name": "eliott-jaquier",
+            "email": "eliott.jaquier@eduvaud.ch"
         }
     ],
     "require": {}
