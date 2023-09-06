@@ -1,0 +1,16 @@
+{
+    "name": "oopers/mvc-framework",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "MVC\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "dimitri-rutz",
+            "email": "dimitri.rutz@eduvaud.ch"
+        }
+    ],
+    "require": {}
+}
