@@ -3,7 +3,7 @@ A simple MVC framework that is used for this app [Exercice Looper](https://githu
 ## Why ?
 The realization of this framework is an exercise carried out (MAW) as part of our training at CPNV. The aim is to create a simple-to-use, object-oriented MVC framework.
 ## The developpment
-- The app is made in PHP and follow the PSR-12 standard.
+- The app is made in PHP 8.2 and follow the PSR-12 standard.
 - IDE is PHPStorm
 - The principle followed is KISS (Keep it simple stupid)
 - We use the 'GitFlow' branching strategy
