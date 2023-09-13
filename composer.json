@@ -7,6 +7,9 @@
             "MVC\\": "src/"
         }
     },
+    "require": {
+        "php": "8.2"
+    },
     "authors": [
         {
             "name": "dimitri-rutz",
