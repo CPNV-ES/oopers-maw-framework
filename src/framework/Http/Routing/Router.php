@@ -67,6 +67,7 @@ class Router
 
     public function errors(array $errors): self
     {
+		if(empty($errors)) return $this;
         foreach ($errors as $error) {
             $this->errors[$error[0]->value] = new ErrorRoute($error[0], $error[1]);
         }
