@@ -9,6 +9,7 @@ use MVC\Http\Exception\HttpException;
 use MVC\Http\Exception\MethodNotAllowedException;
 use MVC\Http\Exception\NotFoundException;
 use MVC\Http\HTTPMethod;
+use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Http\Response\Response;
 
@@ -69,7 +70,7 @@ class Router
     {
 		if(empty($errors)) return $this;
         foreach ($errors as $error) {
-            $this->errors[$error[0]->value] = new ErrorRoute($error[0], $error[1]);
+            $this->errors[$error[0] instanceof HTTPStatus ? $error[0]->value : $error[0]] = new ErrorRoute($error[0], $error[1]);
         }
 
         return $this;
