@@ -63,7 +63,7 @@ class Kernel
     private function registerErrors(): self
     {
 		if(!file_exists(self::projectDir().'/config/errors.php')) throw new RuntimeException("Error routes declaration file not found.");
-        $errors = require self::projectDir().'/config/routes.php';
+        $errors = require self::projectDir().'/config/errors.php';
         $this->router->errors($errors);
         return $this;
     }
