@@ -54,16 +54,16 @@ class Kernel
     private function registerRoutes(): self
     {
         $this->router = new Router();
-		if(!file_exists('../config/errors.php')) throw new RuntimeException("Error routes declaration file not found.");
-        $routes = require '../config/routes.php';
+		if(!file_exists(self::projectDir().'/config/routes.php')) throw new RuntimeException("Error routes declaration file not found.");
+        $routes = require self::projectDir().'/config/routes.php';
         $this->router->routes($routes);
         return $this;
     }
 
     private function registerErrors(): self
     {
-		if(!file_exists('../config/errors.php')) throw new RuntimeException("Error routes declaration file not found.");
-        $errors = require '../config/errors.php';
+		if(!file_exists(self::projectDir().'/config/errors.php')) throw new RuntimeException("Error routes declaration file not found.");
+        $errors = require self::projectDir().'/config/routes.php';
         $this->router->errors($errors);
         return $this;
     }
