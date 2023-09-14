@@ -96,7 +96,6 @@ class Router
      */
     private function findMatchingRoute(Request $request): void
     {
-        dd($this->routes);
         foreach ($this->routes as $route) {
             $match = preg_match_all($route->pattern, $request->uri, $matches);
             if($match === 0) {
