@@ -2,10 +2,10 @@
 
 namespace MVC;
 
-use http\Exception\RuntimeException;
 use MVC\Filesystem\PathResolver;
 use MVC\Http\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Router;
+use RuntimeException;
 use Symfony\Component\Dotenv\Dotenv;
 
 class Kernel
