@@ -10,9 +10,9 @@ class InternalServerErrorException extends HttpException
 
 	const STATUS = HTTPStatus::INTERNAL_SERVER_ERROR;
 
-	public static function getResponse(): Response
+	public function getResponse(): Response
 	{
-		return new Response('Error 500 | Internal Server error', null, HTTPStatus::INTERNAL_SERVER_ERROR);
+		return new Response('Error 500 | Internal Server Error', null, self::STATUS);
 	}
 
 }

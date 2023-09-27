@@ -7,9 +7,9 @@ use MVC\Http\HTTPStatus;
 /**
  * @const HTTPStatus STATUS
  */
-class HttpException extends \Exception
+abstract class HttpException extends \Exception implements HttpExceptionInterface
 {
 
-	const STATUS = HTTPStatus::OK;
+	const STATUS = null;
 
 }

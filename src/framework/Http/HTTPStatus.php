@@ -16,8 +16,9 @@ enum HTTPStatus: int
 	case INTERNAL_SERVER_ERROR = 500;
 
 
-	public static function getException(HTTPStatus $status): HttpException|bool
+	public function getException(HTTPStatus|null $status = null): HttpException|bool
 	{
+		if (is_null($status)) $status = $this;
 		if ($status->value < 400) return false;
 		$str = str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($status->name))));
 		$str = 'MVC\\Http\\Exception\\' . $str.'Exception';

@@ -5,7 +5,8 @@
     "autoload": {
         "psr-4": {
             "MVC\\": "src/framework/",
-            "ORM\\": "src/orm/"
+            "ORM\\": "src/orm/",
+            "App\\": "app/"
         }
     },
     "require": {

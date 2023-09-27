@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>PHP</ID>
+  <OriginalElement>/Users/dimitrirutz/PhpstormProjects/maw-framework/src/framework</OriginalElement>
+  <nodes>
+    <node x="319.5" y="-217.0">\MVC\Singleton</node>
+    <node x="338.0" y="1082.0">\MVC\Http\HTTPStatus</node>
+    <node x="527.0" y="485.0">\MVC\Http\Controller\Controller</node>
+    <node x="765.0" y="1082.0">\MVC\Http\HTTPMethod</node>
+    <node x="746.0" y="407.0">\MVC\Kernel</node>
+    <node x="551.0" y="1082.0">\MVC\Http\Routing\Exception\RoutingException</node>
+    <node x="766.0" y="885.0">\MVC\Http\Routing\ParamConverter</node>
+    <node x="450.0" y="885.0">\MVC\Http\Routing\RouteParam</node>
+    <node x="-208.5" y="1062.5">\MVC\Http\Exception\HttpExceptionInterface</node>
+    <node x="-175.0" y="945.5">\MVC\Http\Exception\HttpException</node>
+    <node x="835.0" y="-217.0">\MVC\Http\Response\Response</node>
+    <node x="61.0" y="-71.0">\MVC\Http\Request</node>
+    <node x="1056.0" y="885.0">\MVC\Filesystem\ClassFinder</node>
+    <node x="524.0" y="407.0">\MVC\Http\Controller\ControllerInterface</node>
+    <node x="61.0" y="885.0">\MVC\Http\Routing\ErrorRoute</node>
+    <node x="533.0" y="-57.0">\MVC\Http\Routing\Router</node>
+    <node x="835.0" y="154.0">\MVC\Http\Response\JsonResponse</node>
+    <node x="246.0" y="131.5">\MVC\DependencyInjectionContainer</node>
+    <node x="1251.0" y="407.0">\MVC\Http\Routing\Annotation\Route</node>
+    <node x="61.0" y="1082.0">\MVC\Filesystem\PathResolver</node>
+    <node x="61.0" y="407.0">\MVC\Http\Routing\Route</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="\MVC\Http\Controller\Controller" target="\MVC\Http\Controller\ControllerInterface" relationship="REALIZATION">
+      <point x="0.0" y="-104.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="\MVC\Http\Exception\HttpException" target="\MVC\Http\Exception\HttpExceptionInterface" relationship="REALIZATION">
+      <point x="-0.0" y="33.5" />
+      <point x="-0.0" y="-33.5" />
+    </edge>
+    <edge source="\MVC\Http\Request" target="\MVC\Singleton" relationship="REALIZATION">
+      <point x="0.0" y="-216.5" />
+      <point x="143.5" y="-96.0" />
+      <point x="379.5" y="-96.0" />
+      <point x="0.0" y="48.0" />
+    </edge>
+    <edge source="\MVC\Http\Response\JsonResponse" target="\MVC\Http\Response\Response" relationship="GENERALIZATION">
+      <point x="0.0" y="-48.0" />
+      <point x="0.0" y="160.5" />
+    </edge>
+    <edge source="\MVC\Http\Routing\Router" target="\MVC\Singleton" relationship="REALIZATION">
+      <point x="0.0" y="-202.5" />
+      <point x="661.5" y="-96.0" />
+      <point x="379.5" y="-96.0" />
+      <point x="0.0" y="48.0" />
+    </edge>
+    <edge source="\MVC\DependencyInjectionContainer" target="\MVC\Singleton" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="48.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.6536796536796536" showDependencies="false" x="421.5" y="466.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constants</Category>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

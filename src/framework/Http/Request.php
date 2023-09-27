@@ -6,9 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MVC\Http\Routing\Route;
 use MVC\Http\Routing\RouteParam;
+use MVC\Singleton;
 
 class Request
 {
+	use Singleton;
+
 	/**
 	 * Populated when request method is POST
 	 * @var Collection
@@ -43,6 +46,14 @@ class Request
 		$this->query = new ArrayCollection();
 		$this->data = new ArrayCollection();
 		$this->headers = new ArrayCollection();
+	}
+
+	public static function getCurrentRequest(): Request
+	{
+		if (!self::$_instance) {
+			self::$_instance = self::createFromCurrent();
+		}
+		return self::$_instance;
 	}
 
 	public static function createFromCurrent(): self
