@@ -2,7 +2,7 @@
 
 namespace MVC\Http\Routing;
 
-use MVC\Http\Controller\ControllerInterface;
+use MVC\Http\Controller\Controller;
 use MVC\Http\HTTPMethod;
 use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
@@ -98,7 +98,7 @@ class Route
 	{
 		try {
 			$r = new \ReflectionClass($this->controller);
-			if(!$r->implementsInterface(ControllerInterface::class)) return false;
+			if(!$r->isSubclassOf(Controller::class)) return false;
 			$m = $r->getMethod($this->controllerMethod);
 		} catch (\ReflectionException) {
 			return false;

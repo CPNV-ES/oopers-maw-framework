@@ -9,7 +9,7 @@ use MVC\Kernel;
 /**
  * Base controller that add general features like render the view
  */
-abstract class Controller implements ControllerInterface
+abstract class Controller
 {
 
 	protected ?string $layout;
