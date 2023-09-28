@@ -2,6 +2,9 @@
 
 namespace MVC;
 
+/**
+ * Trait to make a class a Singleton
+ */
 trait Singleton
 {
 

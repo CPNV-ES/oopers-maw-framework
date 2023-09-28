@@ -2,6 +2,9 @@
 
 namespace MVC\Http;
 
+/**
+ * Enum of different HTTP Method/verbs
+ */
 enum HTTPMethod: string
 {
 	case GET = "GET";

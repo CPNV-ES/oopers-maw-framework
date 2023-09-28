@@ -4,6 +4,10 @@ namespace MVC\Filesystem;
 
 use App\Kernel;
 
+/**
+ * Used to find all classes in specific namespace
+ * @author [Fabien Sa](https://stackoverflow.com/a/40229665)
+ */
 class ClassFinder
 {
 	public static function getClassesInNamespace($namespace): array

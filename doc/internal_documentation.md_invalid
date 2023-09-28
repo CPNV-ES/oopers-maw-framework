@@ -98,4 +98,4 @@ Documentation de [PHPUnit](https://phpunit.de/getting-started/phpunit-10.html)
 
 ### Kernel
 
-Le kernel est le noyau de l’application soit le point d’entrée de celle-ci. L’initialisation du Kernel définit les outils principeaux de l’application. Son rôle est notament de lire les variables d'environnments en utilisant le composant [symfony/dotenv](https://symfony.com/components/Dotenv).
+The kernel is the application's entry point. Kernel initialization defines the application's basic tools. Its role is to read environment variables using the [symfony/dotenv](https://symfony.com/components/Dotenv).

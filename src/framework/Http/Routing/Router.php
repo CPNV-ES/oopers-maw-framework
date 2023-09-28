@@ -127,7 +127,7 @@ class Router
     }
 
 	/**
-	 * Declare errors from <em></em>
+	 * Declare errors from __
 	 * @param array $errors
 	 * @return $this
 	 */
@@ -143,6 +143,7 @@ class Router
 
 
 	/**
+	 * Generate URL from route name including optional parameters
 	 * @throws MissingRouteParamsException
 	 * @throws NotFoundRouteException
 	 */
@@ -156,6 +157,7 @@ class Router
 
 
     /**
+	 * Call findMatchingRoute method with current request and if an HttpException is threw it catch and return Response related to exception
      * @return Response
 	 * @throws \ReflectionException
 	 */
@@ -176,7 +178,7 @@ class Router
     private function findMatchingRoute(Request $request): void
     {
         foreach ($this->routes as $route) {
-            $match = preg_match_all($route->pattern, $request->uri, $matches);
+            $match = preg_match_all($route->getRegExp(), $request->uri, $matches);
             if($match === 0) continue;
 
             if(!$route->isValidMethod($request->method)) {
@@ -184,7 +186,7 @@ class Router
             }
 
             /** @var RouteParam $attr */
-            foreach ($route->attributes as $attr) {
+            foreach ($route->parameters as $attr) {
                 $attr->value = $matches[$attr->name][0];
                 $request->addParam($attr);
             }

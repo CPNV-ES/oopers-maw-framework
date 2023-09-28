@@ -8,6 +8,9 @@ use MVC\Http\Routing\Route;
 use MVC\Http\Routing\RouteParam;
 use MVC\Singleton;
 
+/**
+ * Object that represent a Request by defining all properties a request have
+ */
 class Request
 {
 	use Singleton;
@@ -18,6 +21,10 @@ class Request
 	 */
 	public Collection $data;
 
+	/**
+	 * Array of headers
+	 * @var Collection<string, mixed>
+	 */
 	public Collection $headers;
 
 	/**
@@ -38,6 +45,10 @@ class Request
 	 */
 	public ?Collection $params = null;
 
+	/**
+	 * Current request route that defined in Router
+	 * @var Route|null
+	 */
 	public ?Route $matchedRoute = null;
 
 
@@ -48,6 +59,11 @@ class Request
 		$this->headers = new ArrayCollection();
 	}
 
+
+	/**
+	 * Return singleton of current Request
+	 * @return Request
+	 */
 	public static function getCurrentRequest(): Request
 	{
 		if (!self::$_instance) {
@@ -56,6 +72,10 @@ class Request
 		return self::$_instance;
 	}
 
+	/**
+	 * Return current request and set singleton
+	 * @return Request
+	 */
 	public static function createFromCurrent(): self
 	{
 		$uri = explode('?',$_SERVER['REQUEST_URI'])[0];
@@ -73,7 +93,7 @@ class Request
 			$req->query = new ArrayCollection($_GET);
 		}
 
-		return $req;
+		return self::$_instance = $req;
 	}
 
 	/**

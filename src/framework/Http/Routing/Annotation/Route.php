@@ -5,6 +5,9 @@ namespace MVC\Http\Routing\Annotation;
 use Attribute;
 use MVC\Http\HTTPMethod;
 
+/**
+ * Attribute used to declare routes in controller read with Reflection API
+ */
 #[Attribute(flags: Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Route
 {

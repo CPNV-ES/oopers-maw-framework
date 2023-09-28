@@ -2,17 +2,34 @@
 
 namespace MVC\Http\Routing;
 
-use MVC\Http\Controller\AbstractController;
 use MVC\Http\Controller\ControllerInterface;
 use MVC\Http\HTTPMethod;
 use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 
+/**
+ * A Route is a representation of route containing parameters see RouteParam RegExp pattern to match to URL
+ * @property string $url URL template string
+ * @property class-string $controller ClassName of controller
+ * @property string $controllerMethod Method name of controller
+ * @property HTTPMethod[] $acceptedMethods Array of method(s) can be used with route
+ * @property ?string $name Name can be null if is set it can be used to identify route and to generate url
+ */
 class Route
 {
 
-	public string $pattern;
-	public array $attributes = [];
+	/**
+	 * RegExp pattern
+	 * @var string|mixed
+	 */
+	private string $pattern;
+
+	/**
+	 * Parameters passed in URL
+	 * @see RouteParam
+	 * @var RouteParam[]
+	 */
+	public array $parameters = [];
 
 	private array $matchTypes = [
 		'i'  => '[0-9]++',
@@ -25,17 +42,18 @@ class Route
 
 	/**
 	 * @param string $url
-	 * @param string $controller
+	 * @param class-string $controller
 	 * @param string $controllerMethod
 	 * @param array|string $acceptedMethods
 	 * @param string|null $name
 	 * @throws BadRouteDeclarationException
+	 * @throws \ReflectionException
 	 */
 	public function __construct(
 		public string $url,
 		public string $controller,
 		public string $controllerMethod,
-		public array|string $acceptedMethods = [HTTPMethod::GET],
+		public array $acceptedMethods = [HTTPMethod::GET],
 		public ?string $name = null,
 	)
 	{
@@ -46,11 +64,19 @@ class Route
 		if(!$this->validateController()) throw new BadRouteDeclarationException("Enable to declare route `{$this->url}` due to invalid Controller declaration.");
 	}
 
+	/**
+	 * Verify if passed Method cas trigger current route
+	 * @param HTTPMethod $method
+	 * @return bool
+	 */
 	public function isValidMethod(HTTPMethod $method): bool
 	{
 		return in_array($method, $this->acceptedMethods);
 	}
 
+	/**
+	 * @throws \ReflectionException
+	 */
 	private function setAttributes(array $attributes): void
 	{
 		$reflectionParameters = (new \ReflectionMethod($this->controller, $this->controllerMethod))->getParameters();
@@ -63,7 +89,7 @@ class Route
 				}
 			}
 
-			$this->attributes[$attribute] = new RouteParam($attribute, $type);
+			$this->parameters[$attribute] = new RouteParam($attribute, $type);
 		}
 	}
 
@@ -89,11 +115,8 @@ class Route
 				[$block, $pre, $type, $param, $optional] = $match;
 
 				$attrs[] = $param;
-
 				if (isset($matchTypes[$type])) $type = $matchTypes[$type];
-
 				if ($pre === '.') $pre = '\.';
-
 				$optional = $optional !== '' ? '?' : null;
 
 				$pattern = '(?:'
@@ -117,6 +140,12 @@ class Route
 	}
 
 
+	/**
+	 * Generate URL with params
+	 * @param array|null $params
+	 * @return string
+	 * @throws MissingRouteParamsException
+	 */
 	public function buildUrl(?array $params = null): string
 	{
 		$url = $this->url;
@@ -145,5 +174,16 @@ class Route
 
 		return $url;
 	}
+
+
+	/**
+	 * @return string
+	 */
+	public  function getPattern(): string
+	{
+		return $this->pattern;
+	}
+
+
 
 }

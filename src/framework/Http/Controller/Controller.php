@@ -6,6 +6,9 @@ use MVC\Http\Request;
 use MVC\Http\Response\Response;
 use MVC\Kernel;
 
+/**
+ * Base controller that add general features like render the view
+ */
 abstract class Controller implements ControllerInterface
 {
 
@@ -24,11 +27,23 @@ abstract class Controller implements ControllerInterface
 	}
 
 	/**
-	* @param string $view View path formatted <em>(e.g. posts/index.php => posts.index)<em>
-	* @param array $content
-	* @return Response
+	 * Render a view and return a Response with rendered view as content
+	 * @param string $view View path formatted _(e.g. posts/index.php => posts.index)_
+	 * @param array $content
+	 * @return Response
 	 */
-	public function render(string $view, array $content = []): Response
+	protected function render(string $view, array $content = []): Response
+	{
+		return new Response($this->renderView($view, $content));
+	}
+
+	/**
+	 * Render a view and return the rendered view as single string
+	 * @param string $view View path formatted _(e.g. posts/index.php => posts.index)_
+	 * @param array $content
+	 * @return string
+	 */
+	public function renderView(string $view, array $content = []): string
 	{
 		extract($content);
 		ob_start();
@@ -36,8 +51,7 @@ abstract class Controller implements ControllerInterface
 		$content = ob_get_clean();
 		ob_start();
 		require(Kernel::kernelVarsToString($this->viewPath . "templates/" . $this->layout . '.php'));
-		$rendered = ob_get_clean();
-		return new Response($rendered);
+		return ob_get_clean();
 	}
 
 }

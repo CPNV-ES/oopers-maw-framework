@@ -8,6 +8,9 @@ use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Router;
 use Symfony\Component\Dotenv\Dotenv;
 
+/**
+ * The kernel is the application's entry point. Kernel initialization defines the application's basic tools. Its role is to read environment variables using the [symfony/dotenv](https://symfony.com/components/Dotenv).
+ */
 // TODO: Implement minimal configuration verification
 // TODO: Implement customized HTTP Error
 class Kernel

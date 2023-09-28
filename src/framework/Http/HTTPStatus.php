@@ -5,6 +5,9 @@ namespace MVC\Http;
 use MVC\Http\Exception\HttpException;
 
 // TODO: Complete Status list
+/**
+ * Enum of different HTTP Status with numeral code and allow to get Exception that correspond to status for blocking status
+ */
 enum HTTPStatus: int
 {
 	case OK = 200;
@@ -16,11 +19,10 @@ enum HTTPStatus: int
 	case INTERNAL_SERVER_ERROR = 500;
 
 
-	public function getException(HTTPStatus|null $status = null): HttpException|bool
+	public function getException(): HttpException|false
 	{
-		if (is_null($status)) $status = $this;
-		if ($status->value < 400) return false;
-		$str = str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($status->name))));
+		if ($this->value < 400) return false;
+		$str = str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($this->name))));
 		$str = 'MVC\\Http\\Exception\\' . $str.'Exception';
 		if(!class_exists($str)) return false;
 		return new $str();

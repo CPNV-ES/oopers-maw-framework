@@ -4,6 +4,9 @@ namespace MVC\Http\Response;
 
 use MVC\Http\HTTPStatus;
 
+/**
+ * Response extended to be compatible with JSON
+ */
 class JsonResponse extends Response
 {
 
@@ -13,7 +16,12 @@ class JsonResponse extends Response
 		$this->headers->set('Content-Type', 'application/json');
 	}
 
-	public function setContent(array|string $content): Response
+	/**
+	 * Take any json encode-able type and turn it into a JSON string and assign it to content property
+	 * @param array|string|object $content
+	 * @return Response
+	 */
+	public function setContent(array|string|object $content): Response
 	{
 		if(is_array($content)) $this->content = json_encode($content);
 		if(is_string($content)) $this->content = $content;
