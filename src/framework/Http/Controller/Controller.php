@@ -21,7 +21,7 @@ abstract class Controller
 	{
 	}
 
-	protected function nameToPath(string $name): string
+	protected function getPathOfView(string $name): string
 	{
 		return Kernel::kernelVarsToString(($this->viewPath . str_replace(['.'], ['/'], $name) . '.php'));
 	}
@@ -47,7 +47,7 @@ abstract class Controller
 	{
 		extract($content);
 		ob_start();
-		require(self::nameToPath($view));
+		require(self::getPathOfView($view));
 		$content = ob_get_clean();
 		ob_start();
 		require(Kernel::kernelVarsToString($this->viewPath . "templates/" . $this->layout . '.php'));
