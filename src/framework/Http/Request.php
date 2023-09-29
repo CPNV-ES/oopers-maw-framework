@@ -45,12 +45,6 @@ class Request
 	 */
 	public ?Collection $params = null;
 
-	/**
-	 * Current request route that defined in Router
-	 * @var Route|null
-	 */
-	public ?Route $matchedRoute = null;
-
 
 	public function __construct(public ?string $uri)
 	{

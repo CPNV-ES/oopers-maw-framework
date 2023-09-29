@@ -42,6 +42,8 @@ class Router
 
     private Request $currentRequest;
 
+	private ?Route $matchedRoute = null;
+
     public function __construct(
         ?Request $currentRequest = null
     ) {
@@ -163,7 +165,7 @@ class Router
     public function run(): Response
     {
         try {
-            $this->findMatchingRoute($this->currentRequest);
+            $this->setMatchingRoute($this->currentRequest);
         } catch (HttpException $e) {
             return $this->route($this->errors[$e::STATUS->value]);
         }
@@ -174,7 +176,7 @@ class Router
      * @throws NotFoundException
      * @throws MethodNotAllowedException
      */
-    private function findMatchingRoute(Request $request): void
+    private function setMatchingRoute(Request $request): void
     {
         foreach ($this->routes as $route) {
             $match = preg_match_all($route->getRegExp(), $request->uri, $matches);
@@ -189,8 +191,8 @@ class Router
                 $attr->value = $matches[$attr->name][0];
                 $request->addParam($attr);
             }
-            $this->currentRequest->matchedRoute = $route;
-            return;
+            $this->matchedRoute = $route;
+			return;
         }
         throw new NotFoundException();
     }
