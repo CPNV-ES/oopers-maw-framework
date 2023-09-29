@@ -13,7 +13,6 @@ use MVC\Singleton;
  */
 class Request
 {
-	use Singleton;
 
 	/**
 	 * Populated when request method is POST
@@ -53,21 +52,8 @@ class Request
 		$this->headers = new ArrayCollection();
 	}
 
-
 	/**
-	 * Return singleton of current Request
-	 * @return Request
-	 */
-	public static function getCurrentRequest(): Request
-	{
-		if (!self::$_instance) {
-			self::$_instance = self::createFromCurrent();
-		}
-		return self::$_instance;
-	}
-
-	/**
-	 * Return current request and set singleton
+	 * Build and return current request
 	 * @return Request
 	 */
 	public static function createFromCurrent(): self
@@ -87,7 +73,7 @@ class Request
 			$req->query = new ArrayCollection($_GET);
 		}
 
-		return self::$_instance = $req;
+		return $req;
 	}
 
 	/**
