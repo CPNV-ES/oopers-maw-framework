@@ -168,9 +168,9 @@ class Router
         try {
             $this->setMatchingRoute($this->currentRequest);
         } catch (HttpException $e) {
-            return $this->route($this->errors[$e::STATUS->value]);
+            return $this->callRouteAction($this->errors[$e::STATUS->value]);
         }
-        return $this->route($this->matchedRoute);
+        return $this->callRouteAction($this->matchedRoute);
     }
 
     /**
