@@ -7,3 +7,4 @@
 .env
 /templates/
 /views/
+/.phpdoc/
