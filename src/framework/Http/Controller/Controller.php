@@ -2,6 +2,7 @@
 
 namespace MVC\Http\Controller;
 
+use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Http\Response\Response;
 use MVC\Kernel;
@@ -30,11 +31,12 @@ abstract class Controller
 	 * Render a view and return a Response with rendered view as content
 	 * @param string $view View path formatted _(e.g. posts/index.php => posts.index)_
 	 * @param array $content
+	 * @param HTTPStatus $status
 	 * @return Response
 	 */
-	protected function render(string $view, array $content = []): Response
+	protected function render(string $view, array $content = [], HTTPStatus $status = HTTPStatus::OK): Response
 	{
-		return new Response($this->renderView($view, $content));
+		return new Response($this->renderView($view, $content), null, $status);
 	}
 
 	/**
