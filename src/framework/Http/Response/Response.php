@@ -80,8 +80,7 @@ class Response
 
 	/**
 	 * Will use all defined information in the Response to set using PHP functions Headers/Status Code/Body of the response
-	 * Method is not blocking for blocking:
-	 * @uses self::executeAndDie()
+	 * Method is not blocking
 	 * @return void
 	 */
 	public function execute(): void
@@ -91,16 +90,6 @@ class Response
 			header($key . ' ' . $header);
 		}
 		if ($this->getContent()) echo $this->getContent();
-	}
-
-	/**
-	 * Call execute method and exit program
-	 * @return void
-	 */
-	public function executeAndDie(): void
-	{
-		$this->execute();
-		exit(0);
 	}
 
 
