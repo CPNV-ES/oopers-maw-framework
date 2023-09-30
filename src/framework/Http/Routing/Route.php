@@ -31,15 +31,6 @@ class Route
 	 */
 	public array $parameters = [];
 
-	private array $matchTypes = [
-		'i'  => '[0-9]++',
-		'a'  => '[0-9A-Za-z]++',
-		'h'  => '[0-9A-Fa-f]++',
-		'*'  => '.+?',
-		'**' => '.++',
-		''   => '[^/\.]++'
-	];
-
 	/**
 	 * @param string $url
 	 * @param class-string $controller
@@ -57,11 +48,12 @@ class Route
 		public ?string $name = null,
 	)
 	{
-		[$attrs, $pattern] = self::getUrlRegexAndAttrs($this->url);
-
-		$this->pattern = $pattern;
-		$this->setAttributes($attrs);
 		if(!$this->validateController()) throw new BadRouteDeclarationException("Enable to declare route `{$this->url}` due to invalid Controller declaration.");
+		$compiler = new RouteCompiler($this->url);
+		$this
+			->setPattern($compiler->getPattern())
+			->setParameters($compiler->extractRouteParameters((new \ReflectionMethod($this->controller, $this->controllerMethod))->getParameters()))
+		;
 	}
 
 	/**
@@ -72,25 +64,6 @@ class Route
 	public function isValidMethod(HTTPMethod $method): bool
 	{
 		return in_array($method, $this->acceptedMethods);
-	}
-
-	/**
-	 * @throws \ReflectionException
-	 */
-	private function setAttributes(array $attributes): void
-	{
-		$reflectionParameters = (new \ReflectionMethod($this->controller, $this->controllerMethod))->getParameters();
-		$type = null;
-		foreach ($attributes as $attribute) {
-			foreach ($reflectionParameters as $param) {
-				if($attribute === $param->getName()) {
-					if (!$param->hasType()) break;
-					$type = $param->getType()->getName();
-				}
-			}
-
-			$this->parameters[$attribute] = new RouteParam($attribute, $type);
-		}
 	}
 
 
@@ -106,40 +79,6 @@ class Route
 		return true;
 	}
 
-	private function getUrlRegexAndAttrs(string $route): array
-	{
-		$attrs = [];
-		if (preg_match_all('`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $route, $matches, PREG_SET_ORDER)) {
-			$matchTypes = $this->matchTypes;
-			foreach ($matches as $match) {
-				[$block, $pre, $type, $param, $optional] = $match;
-
-				$attrs[] = $param;
-				if (isset($matchTypes[$type])) $type = $matchTypes[$type];
-				if ($pre === '.') $pre = '\.';
-				$optional = $optional !== '' ? '?' : null;
-
-				$pattern = '(?:'
-					. ($pre !== '' ? $pre : null)
-					. '('
-					. ($param !== '' ? "?P<$param>" : null)
-					. $type
-					. ')'
-					. $optional
-					. ')'
-					. $optional;
-
-				$route = str_replace($block, $pattern, $route);
-			}
-		}
-
-		return [
-			$attrs,
-			"`^$route$`u"
-		];
-	}
-
-
 	/**
 	 * Generate URL with params
 	 * @param array|null $params
@@ -151,7 +90,6 @@ class Route
 		$url = $this->url;
 
 		if (preg_match_all('`(/|\.|)\[([^:\]]*+)(?::([^:\]]*+))?\](\?|)`', $this->url, $matches, PREG_SET_ORDER)) {
-			$matchTypes = $this->matchTypes;
 			foreach ($matches as $index => $match) {
 				[$block, $pre, $type, $param, $optional] = $match;
 
@@ -179,9 +117,39 @@ class Route
 	/**
 	 * @return string
 	 */
-	public  function getPattern(): string
+	public function getPattern(): string
 	{
 		return $this->pattern;
+	}
+
+	/**
+	 * @param string $pattern
+	 * @return Route
+	 */
+	public  function setPattern(string $pattern): self
+	{
+		$this->pattern = $pattern;
+		return $this;
+	}
+
+	/**
+	 * @param array $parameters
+	 * @return Route
+	 */
+	public  function setParameters(array $parameters): self
+	{
+		$this->parameters = $parameters;
+		return $this;
+	}
+
+	/**
+	 * @param RouteParam $routeParam
+	 * @return Route
+	 */
+	public  function addParameter(RouteParam $routeParam): self
+	{
+		$this->parameters[$routeParam->name] = $routeParam;
+		return $this;
 	}
 
 
