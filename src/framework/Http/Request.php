@@ -40,9 +40,9 @@ class Request
 
 	/**
 	 * Arguments passed in URL
-	 * @var Collection|null
+	 * @var Collection
 	 */
-	public ?Collection $params = null;
+	public Collection $params;
 
 
 	public function __construct(public ?string $uri)
@@ -50,6 +50,7 @@ class Request
 		$this->query = new ArrayCollection();
 		$this->data = new ArrayCollection();
 		$this->headers = new ArrayCollection();
+		$this->params = new ArrayCollection();
 	}
 
 	/**

@@ -33,7 +33,7 @@ class Response
 	 */
 	public Collection $headers;
 
-	public function __construct(string $content = "", ?string $uri = "", $status = HTTPStatus::OK, array|ArrayCollection $headers = new ArrayCollection())
+	public function __construct(?string $content = null, ?string $uri = "", $status = HTTPStatus::OK, array|ArrayCollection $headers = new ArrayCollection())
 	{
 		$this->headers = $headers;
 		$this->headers->set('Content-Type', 'text/html');
@@ -90,7 +90,7 @@ class Response
 		foreach ($this->headers as $key => $header) {
 			header($key . ' ' . $header);
 		}
-		echo $this->getContent();
+		if ($this->getContent()) echo $this->getContent();
 	}
 
 	/**
