@@ -203,8 +203,7 @@ class Router
      * @return Response
 	 * @throws \ReflectionException
 	 */
-	// TODO: Find new name
-    private function route(Route|ErrorRoute $route): Response
+    private function callRouteAction(Route|ErrorRoute $route): Response
     {
 		$controllerMethod = $route->controllerMethod;
 
