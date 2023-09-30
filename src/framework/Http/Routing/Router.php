@@ -56,6 +56,7 @@ class Router
     /**
 	 * Create route from direct call
      * @throws BadRouteDeclarationException
+	 * @throws \ReflectionException
 	 * @deprecated Due to Attribute route declaration
      */
     public function add(string $url, array $controller, ?string $name = null, array $methods = [HTTPMethod::GET]): Route
@@ -169,7 +170,7 @@ class Router
         } catch (HttpException $e) {
             return $this->route($this->errors[$e::STATUS->value]);
         }
-        return $this->route($this->currentRequest->matchedRoute);
+        return $this->route($this->matchedRoute);
     }
 
     /**
@@ -179,7 +180,7 @@ class Router
     private function setMatchingRoute(Request $request): void
     {
         foreach ($this->routes as $route) {
-            $match = preg_match_all($route->getRegExp(), $request->uri, $matches);
+            $match = preg_match_all($route->getPattern(), $request->uri, $matches);
             if($match === 0) continue;
 
             if(!$route->isValidMethod($request->method)) {
