@@ -4,14 +4,11 @@ namespace MVC\Http\Routing;
 
 use MVC\Http\HTTPStatus;
 
-// TODO: Make extends from Route
 /**
  * Class used to define which Controller action to execute for given HTTPStatus
  * @property HTTPStatus $status Define which status to use
- * @property class-string $controller ClassName of controller
- * @property string $controllerMethod Method name of controller
  */
-class ErrorRoute
+class ErrorRoute extends AbstractRoute
 {
 
 	/**
@@ -20,11 +17,24 @@ class ErrorRoute
 	 * @param string $controllerMethod
 	 */
 	public function __construct(
-		public HTTPStatus $status,
-		public string $controller,
-		public string $controllerMethod,
+		private readonly HTTPStatus $status,
+		string                      $controller,
+		string                      $controllerMethod,
 	)
 	{
+		$this
+			->setName('_error.' . strtolower($this->status->name))
+			->setController($controller)
+			->setControllerMethod($controllerMethod);
 	}
+
+	/**
+	 * @return HTTPStatus
+	 */
+	public function getStatus(): HTTPStatus
+	{
+		return $this->status;
+	}
+
 
 }

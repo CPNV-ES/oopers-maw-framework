@@ -6,23 +6,17 @@ use MVC\Http\Controller\Controller;
 use MVC\Http\HTTPMethod;
 use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
+use ReflectionException;
+use ReflectionMethod;
 
 /**
  * A Route is a representation of route containing parameters see RouteParam RegExp pattern to match to URL
- * @property string $url URL template string
- * @property class-string $controller ClassName of controller
- * @property string $controllerMethod Method name of controller
+ * @property
  * @property HTTPMethod[] $acceptedMethods Array of method(s) can be used with route
  * @property ?string $name Name can be null if is set it can be used to identify route and to generate url
  */
-class Route
+class Route extends AbstractRoute
 {
-
-	/**
-	 * RegExp pattern
-	 * @var string|mixed
-	 */
-	private string $pattern;
 
 	/**
 	 * Parameters passed in URL
@@ -32,51 +26,49 @@ class Route
 	public array $parameters = [];
 
 	/**
+	 * RegExp pattern
+	 * @var string|mixed
+	 */
+	private string $pattern;
+
+	/**
+	 * @var string $url URL template string
+	 */
+	private string $url;
+
+	private array $acceptedMethods = [];
+
+	/**
 	 * @param string $url
 	 * @param class-string $controller
 	 * @param string $controllerMethod
-	 * @param array|string $acceptedMethods
+	 * @param array $acceptedMethods
 	 * @param string|null $name
 	 * @throws BadRouteDeclarationException
-	 * @throws \ReflectionException
+	 * @throws ReflectionException
 	 */
 	public function __construct(
-		public string $url,
-		public string $controller,
-		public string $controllerMethod,
-		public array $acceptedMethods = [HTTPMethod::GET],
-		public ?string $name = null,
+		 string 	$url,
+		 string 	$controller,
+		 string 	$controllerMethod,
+		 array  	$acceptedMethods = [HTTPMethod::GET],
+		 ?string	$name = null
 	)
 	{
-		if(!$this->validateController()) throw new BadRouteDeclarationException("Enable to declare route `{$this->url}` due to invalid Controller declaration.");
+		$this
+			->setName($name)
+			->setUrl($url)
+			->setAcceptedMethods($acceptedMethods)
+			->setController($controller)
+			->setControllerMethod($controllerMethod)
+		;
+
+		if (!$this->validateController()) throw new BadRouteDeclarationException("Enable to declare route `{$this->url}` due to invalid Controller declaration.");
+
 		$compiler = new RouteCompiler($this->url);
 		$this
 			->setPattern($compiler->getPattern())
-			->setParameters($compiler->extractRouteParameters((new \ReflectionMethod($this->controller, $this->controllerMethod))->getParameters()))
-		;
-	}
-
-	/**
-	 * Verify if passed Method cas trigger current route
-	 * @param HTTPMethod $method
-	 * @return bool
-	 */
-	public function isValidMethod(HTTPMethod $method): bool
-	{
-		return in_array($method, $this->acceptedMethods);
-	}
-
-
-	private function validateController(): bool
-	{
-		try {
-			$r = new \ReflectionClass($this->controller);
-			if(!$r->isSubclassOf(Controller::class)) return false;
-			$m = $r->getMethod($this->controllerMethod);
-		} catch (\ReflectionException) {
-			return false;
-		}
-		return true;
+			->setParameters($compiler->extractRouteParameters((new ReflectionMethod($this->controller, $this->controllerMethod))->getParameters()));
 	}
 
 	/**
@@ -113,7 +105,6 @@ class Route
 		return $url;
 	}
 
-
 	/**
 	 * @return string
 	 */
@@ -126,32 +117,85 @@ class Route
 	 * @param string $pattern
 	 * @return Route
 	 */
-	public  function setPattern(string $pattern): self
+	public function setPattern(string $pattern): self
 	{
 		$this->pattern = $pattern;
 		return $this;
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getParameters(): array
+	{
+		return $this->parameters;
+	}
+
+	/**
 	 * @param array $parameters
 	 * @return Route
 	 */
-	public  function setParameters(array $parameters): self
+	public function setParameters(array $parameters): self
 	{
 		$this->parameters = $parameters;
 		return $this;
 	}
 
 	/**
+	 * Verify if passed Method cas trigger current route
+	 * @param HTTPMethod $method
+	 * @return bool
+	 */
+	public function isValidMethod(HTTPMethod $method): bool
+	{
+		return in_array($method, $this->acceptedMethods);
+	}
+
+	/**
 	 * @param RouteParam $routeParam
 	 * @return Route
 	 */
-	public  function addParameter(RouteParam $routeParam): self
+	public function addParameter(RouteParam $routeParam): self
 	{
 		$this->parameters[$routeParam->name] = $routeParam;
 		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getUrl(): string
+	{
+		return $this->url;
+	}
+
+	/**
+	 * @param string $url
+	 * @return Route
+	 */
+	public function setUrl(string $url): Route
+	{
+		$this->url = $url;
+		return $this;
+	}
+
+	/**
+	 * @return HTTPMethod[]
+	 */
+	public function getAcceptedMethods(): array
+	{
+		return $this->acceptedMethods;
+	}
+
+	/**
+	 * @param HTTPMethod[] $acceptedMethods
+	 * @return Route
+	 */
+	public function setAcceptedMethods(array $acceptedMethods): Route
+	{
+		$this->acceptedMethods = $acceptedMethods;
+		return $this;
+	}
 
 
 }
