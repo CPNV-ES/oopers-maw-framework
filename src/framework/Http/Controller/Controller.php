@@ -51,9 +51,14 @@ abstract class Controller
 		ob_start();
 		require(self::getPathOfView($view));
 		$content = ob_get_clean();
-		ob_start();
-		require(Kernel::kernelVarsToString($this->viewPath . "templates/" . $this->layout . '.php'));
-		return ob_get_clean();
+		if($this->layout) {
+			ob_start();
+			require(Kernel::kernelVarsToString($this->viewPath . "templates/" . $this->layout . '.php'));
+			return ob_get_clean();
+		}
+		else {
+			return $content;
+		}
 	}
 
 }
