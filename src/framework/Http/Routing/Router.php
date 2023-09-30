@@ -63,7 +63,7 @@ class Router
     {
         $route = new Route($url, $controller[0], $controller[1], $methods, $name);
         $this->routes[] = $route;
-        if(!is_null($route->name)) $this->namedRoutes[$route->name] = $route;
+        if(!is_null($route->getName())) $this->namedRoutes[$route->getName()] = $route;
         return $route;
     }
 
@@ -101,7 +101,7 @@ class Router
 						);
 					}
 
-					if ($attr->getArguments()['name']) $this->namedRoutes->set($out->name, $out);
+					if ($attr->getArguments()['name']) $this->namedRoutes->set($out->getName(), $out);
 
 					$p[] = $out;
 				}
@@ -132,6 +132,7 @@ class Router
 	 * Declare errors from __
 	 * @param array $errors
 	 * @return $this
+	 * @deprecated Due to Attribute route declaration
 	 */
     public function errors(array $errors): self
     {
@@ -188,7 +189,7 @@ class Router
             }
 
             /** @var RouteParam $attr */
-            foreach ($route->parameters as $attr) {
+            foreach ($route->getParameters() as $attr) {
                 $attr->value = $matches[$attr->name][0];
                 $request->addParam($attr);
             }
@@ -198,20 +199,21 @@ class Router
         throw new NotFoundException();
     }
 
-    /**
-     * @param Route|ErrorRoute $route
-     * @return Response
+	/**
+	 * @param AbstractRoute $route
+	 * @return Response
 	 * @throws \ReflectionException
 	 */
-    private function callRouteAction(Route|ErrorRoute $route): Response
+    private function callRouteAction(AbstractRoute $route): Response
     {
-		$controllerMethod = $route->controllerMethod;
+		$controllerMethod = $route->getControllerMethod();
+		$controllerName = $route->getController();
 
-		$paramConverter = new ParamConverter($route->controller, $route->controllerMethod);
+		$paramConverter = new ParamConverter($route);
 		$params = $paramConverter->getParams($this->currentRequest);
 
 		/** @var Controller $controller */
-		$controller = new $route->controller($this->currentRequest);
+		$controller = new $controllerName($this->currentRequest);
 
 		return $controller->$controllerMethod(...$params);
     }
