@@ -27,6 +27,9 @@ class Kernel
 		$dotenv = new Dotenv();
 		$dotenv->load($envPath);
 
+		if(!isset($_ENV['APP_ENV'])) $_ENV['APP_ENV'] = "PROD";
+		if(!in_array($_ENV['APP_ENV'], ['PROD', 'DEV'])) $_ENV['APP_ENV'] = "PROD";
+
 		try {
 			$this
 				->init()
@@ -40,6 +43,7 @@ class Kernel
 			$exception->getResponse()->execute();
 		}
         catch (\Throwable $error) {
+			if($_ENV['APP_ENV'] === 'DEV') dd($error);
         	(new Http\Exception\InternalServerErrorException)->getResponse()->execute();
         }
     }
