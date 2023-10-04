@@ -14,8 +14,8 @@ use MVC\Kernel;
 abstract class Controller
 {
 
-	protected ?string $layout;
-	protected ?string $viewPath;
+	protected ?string $layout = 'base';
+	protected ?string $viewPath = '%kernel.project_dir%/views/';
 
 	public function __construct(
 		protected Request $request,
