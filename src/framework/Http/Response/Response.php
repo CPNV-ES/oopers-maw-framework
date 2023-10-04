@@ -29,7 +29,7 @@ class Response
 	/**
 	 * HTTP headers for responses follow the same structure as any other header: a case-insensitive string followed by a colon (`':'`) and a value whose structure depends upon the type of the header. The whole header, including its value, presents as a single line.
 	 * @see [MDN HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#headers_2)
-	 * @var Collection
+	 * @var Collection<string, string|array>
 	 */
 	public Collection $headers;
 
@@ -87,7 +87,8 @@ class Response
 	{
 		http_response_code($this->status->value);
 		foreach ($this->headers as $key => $header) {
-			header($key . ' ' . $header);
+			if (is_array($header)) $header = implode(',', $header);
+			header($key . ': ' . $header);
 		}
 		if ($this->getContent()) echo $this->getContent();
 	}
