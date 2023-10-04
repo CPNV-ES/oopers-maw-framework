@@ -33,7 +33,7 @@ class Response
 	 */
 	public Collection $headers;
 
-	public function __construct(?string $content = null, ?string $uri = "", $status = HTTPStatus::OK, array|ArrayCollection $headers = new ArrayCollection())
+	public function __construct(?string $content = null, $status = HTTPStatus::OK, array|ArrayCollection $headers = new ArrayCollection())
 	{
 		$this->headers = $headers;
 		$this->headers->set('Content-Type', 'text/html');

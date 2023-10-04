@@ -10,9 +10,9 @@ use MVC\Http\HTTPStatus;
 class JsonResponse extends Response
 {
 
-	public function __construct(string $content = "", ?string $uri = null, array $headers = [], $status = HTTPStatus::OK)
+	public function __construct(string $content = "", array $headers = [], $status = HTTPStatus::OK)
 	{
-		parent::__construct($content, $uri, $status, $headers);
+		parent::__construct($content, $status, $headers);
 		$this->headers->set('Content-Type', 'application/json');
 	}
 
