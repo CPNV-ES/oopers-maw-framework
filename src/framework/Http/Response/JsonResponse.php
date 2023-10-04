@@ -21,7 +21,7 @@ class JsonResponse extends Response
 	 * @param array|string|object $content
 	 * @return Response
 	 */
-	public function setContent(array|string|object $content): Response
+	public function setContent(array|string|object|null $content): Response
 	{
 		if(is_array($content)) $this->content = json_encode($content);
 		if(is_string($content)) $this->content = $content;
