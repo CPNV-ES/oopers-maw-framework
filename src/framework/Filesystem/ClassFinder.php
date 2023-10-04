@@ -2,6 +2,8 @@
 
 namespace MVC\Filesystem;
 
+use MVC\Kernel;
+
 /**
  * Used to find all classes in specific namespace
  * @author [Fabien Sa](https://stackoverflow.com/a/40229665)
