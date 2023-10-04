@@ -150,50 +150,6 @@ class Router
 	}
 
 	/**
-	 * Create routes from an array of array declaration method
-	 * @throws BadRouteDeclarationException
-	 * @deprecated Due to Attribute route declaration
-	 */
-	public function routes(array $routes): self
-	{
-		array_map(function ($route) {
-			$this->add($route[0], $route[1], $route[2] ?? null, $route[3] ?? [HTTPMethod::GET]);
-		}, $routes);
-
-		return $this;
-	}
-
-	/**
-	 * Create route from direct call
-	 * @throws BadRouteDeclarationException
-	 * @throws ReflectionException
-	 * @deprecated Due to Attribute route declaration
-	 */
-	public function add(string $url, array $controller, ?string $name = null, array $methods = [HTTPMethod::GET]): Route
-	{
-		$route = new Route($url, $controller[0], $controller[1], $methods, $name);
-		$this->routes[] = $route;
-		if (!is_null($route->getName())) $this->namedRoutes[$route->getName()] = $route;
-		return $route;
-	}
-
-	/**
-	 * Declare errors from __
-	 * @param array $errors
-	 * @return $this
-	 * @deprecated Due to Attribute route declaration
-	 */
-	public function errors(array $errors): self
-	{
-		if (empty($errors)) return $this;
-		foreach ($errors as $error) {
-			$this->errors[$error[0] instanceof HTTPStatus ? $error[0]->value : $error[0]] = new ErrorRoute($error[0], $error[1][0], $error[1][1]);
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Call findMatchingRoute method with current request and if an HttpException is threw it catch and return Response related to exception
 	 * @return Response
 	 * @throws ReflectionException
