@@ -29,7 +29,7 @@ class Route
 			$this->methods[] = HTTPMethod::from($methods);
 			return;
 		}
-		$this->methods = array_map(fn($item) => HTTPMethod::from($item), $methods);
+		$this->methods = array_map(fn($item) => $item instanceof HTTPMethod ? $item : HTTPMethod::from($item), $methods);
 	}
 
 	public function getMethods(): array
