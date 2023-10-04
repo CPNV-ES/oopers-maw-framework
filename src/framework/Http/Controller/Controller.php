@@ -7,6 +7,7 @@ use MVC\Http\Request;
 use MVC\Http\Response\Response;
 use MVC\Kernel;
 
+// TODO: Refine render component
 /**
  * Base controller that add general features like render the view
  */
@@ -26,6 +27,7 @@ abstract class Controller
 	{
 		return Kernel::kernelVarsToString(($this->viewPath . str_replace(['.'], ['/'], $name) . '.php'));
 	}
+
 
 	/**
 	 * Render a view and return a Response with rendered view as content
