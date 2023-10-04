@@ -38,7 +38,7 @@ abstract class Controller
 	 */
 	protected function render(string $view, array $content = [], HTTPStatus $status = HTTPStatus::OK): Response
 	{
-		return new Response($this->renderView($view, $content), null, $status);
+		return new Response($this->renderView($view, $content), $status);
 	}
 
 	/**
