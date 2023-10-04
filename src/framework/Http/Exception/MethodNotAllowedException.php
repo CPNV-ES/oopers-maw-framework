@@ -8,11 +8,11 @@ use MVC\Http\Response\Response;
 class MethodNotAllowedException extends HttpException
 {
 
-	const STATUS = HTTPStatus::METHOD_NOT_ALLOWED;
+    public const STATUS = HTTPStatus::METHOD_NOT_ALLOWED;
 
-	public function getResponse(): Response
-	{
-		return new Response('Error 405 | Method Not Allowed', null, self::STATUS);
-	}
+    public function getResponse(): Response
+    {
+        return new Response('Error 405 | Method Not Allowed', self::STATUS);
+    }
 
 }

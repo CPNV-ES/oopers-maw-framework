@@ -8,11 +8,11 @@ use MVC\Http\Response\Response;
 class BadRequestException extends HttpException
 {
 
-	const STATUS = HTTPStatus::BAD_REQUEST;
+    public const STATUS = HTTPStatus::BAD_REQUEST;
 
-	public function getResponse(): Response
-	{
-		return new Response('Error 400 | Bad Request', null, self::STATUS);
-	}
+    public function getResponse(): Response
+    {
+        return new Response('Error 400 | Bad Request', self::STATUS);
+    }
 
 }

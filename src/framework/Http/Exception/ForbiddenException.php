@@ -8,10 +8,10 @@ use MVC\Http\Response\Response;
 class ForbiddenException extends HttpException
 {
 
-	const STATUS = HTTPStatus::FORBIDDEN;
+    public const STATUS = HTTPStatus::FORBIDDEN;
 
-	public function getResponse(): Response
-	{
-		return new Response("Error 403 | Forbidden", null, self::STATUS);
-	}
+    public function getResponse(): Response
+    {
+        return new Response("Error 403 | Forbidden", self::STATUS);
+    }
 }

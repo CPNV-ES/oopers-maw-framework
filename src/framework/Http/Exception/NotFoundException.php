@@ -8,11 +8,11 @@ use MVC\Http\Response\Response;
 class NotFoundException extends HttpException
 {
 
-	const STATUS = HTTPStatus::NOT_FOUND;
+    public const STATUS = HTTPStatus::NOT_FOUND;
 
-	public function getResponse(): Response
-	{
-		return new Response('Error 404 | Not Found', null, self::STATUS);
-	}
+    public function getResponse(): Response
+    {
+        return new Response('Error 404 | Not Found', self::STATUS);
+    }
 
 }

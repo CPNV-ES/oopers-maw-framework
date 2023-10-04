@@ -8,11 +8,11 @@ use MVC\Http\Response\Response;
 class UnauthorizedException extends HttpException
 {
 
-	const STATUS = HTTPStatus::UNAUTHORIZED;
+    public const STATUS = HTTPStatus::UNAUTHORIZED;
 
-	public function getResponse(): Response
-	{
-		return new Response('Error 401 | Unauthorized', null, self::STATUS);
-	}
+    public function getResponse(): Response
+    {
+        return new Response('Error 401 | Unauthorized', self::STATUS);
+    }
 
 }
