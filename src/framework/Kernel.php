@@ -27,7 +27,7 @@ class Kernel
 		$dotenv = new Dotenv();
 		$dotenv->load($envPath);
 
-		/*try {*/
+		try {
 			$this
 				->init()
 				->loadControllers()
@@ -35,13 +35,13 @@ class Kernel
 				->registerErrors()
 				->listen()
 			;
-        /*}
+        }
 		catch (HttpException $exception) {
-			$exception->getResponse()->executeAndDie();
+			$exception->getResponse()->execute();
 		}
         catch (\Throwable $error) {
-        	(new Http\Exception\InternalServerErrorException)->getResponse()->executeAndDie();
-        }*/
+        	(new Http\Exception\InternalServerErrorException)->getResponse()->execute();
+        }
     }
 
 	private function init(): self
