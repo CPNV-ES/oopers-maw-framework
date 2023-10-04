@@ -15,9 +15,9 @@ class Response
 	/**
 	 * Not all responses have one: responses with a status code that sufficiently answers the request without the need for corresponding payload (like `201` **`Created`** or `204` **`No Content`**) usually don't.
 	 * @see [MDN HTTP Body](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#body_2)
-	 * @var string
+	 * @var string|null
 	 */
-	public string $content = "";
+	public ?string $content = "";
 
 	/**
 	 * A status code, indicating success or failure of the request. Common status codes are 200, 404, or 302
@@ -42,18 +42,18 @@ class Response
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getContent(): string
+	public function getContent(): ?string
 	{
 		return $this->content;
 	}
 
 	/**
-	 * @param string $content
+	 * @param string|null $content
 	 * @return Response
 	 */
-	public function setContent(string $content): Response
+	public function setContent(?string $content): Response
 	{
 		$this->content = $content;
 		return $this;
