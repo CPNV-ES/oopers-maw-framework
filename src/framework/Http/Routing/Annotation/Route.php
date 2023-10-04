@@ -32,6 +32,11 @@ class Route
 		$this->methods = array_map(fn($item) => HTTPMethod::from($item), $methods);
 	}
 
+	public function getMethods(): array
+	{
+		return $this->methods;
+	}
+
 
 
 

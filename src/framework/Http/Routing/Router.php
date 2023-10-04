@@ -80,29 +80,31 @@ class Router
 			if (!is_subclass_of($currentClass, Controller::class)) return $past;
 
 			$class = new ReflectionClass($currentClass);
-			$parentRoute = $class->getAttributes(Annotation\Route::class)[0] ?? null;
+			/** @var Annotation\Route $parentRoute */
+			$parentRoute = $class->getAttributes(Annotation\Route::class)[0]?->newInstance() ?? null;
 			$routes = array_reduce($class->getMethods(), function ($p, $c) use ($parentRoute) {
 				if (!empty($c->getAttributes(Annotation\Route::class))) {
-					$attr = $c->getAttributes(Annotation\Route::class)[0];
+					/** @var Annotation\Route $attr */
+					$attr = $c->getAttributes(Annotation\Route::class)[0]->newInstance();
 					if ($parentRoute) {
 						$out = new Route(
-							$parentRoute->getArguments()[0] . $attr->getArguments()[0],
+							$parentRoute->path . $attr->path,
 							$c->class,
 							$c->getName(),
-							$attr->getArguments()['methods'] ?? [HTTPMethod::GET],
-							isset($attr->getArguments()['name']) ? isset($parentRoute->getArguments()['name']) ? $parentRoute->getArguments()['name'] . $attr->getArguments()['name'] : $attr->getArguments()['name'] : null
+							$attr->getMethods() ?? [HTTPMethod::GET],
+							isset($attr->name) ? isset($parentRoute->name) ? $parentRoute->name . $attr->name : $attr->name : null
 						);
 					} else {
 						$out = new Route(
-							$attr->getArguments()[0],
+							$attr->path,
 							$c->class,
 							$c->getName(),
-							$attr->getArguments()['methods'] ?? [HTTPMethod::GET],
-							$attr->getArguments()['name'] ?? null
+							$attr->getMethods() ?? [HTTPMethod::GET],
+							$attr->name ?? null
 						);
 					}
 
-					if ($attr->getArguments()['name']) $this->namedRoutes->set($out->getName(), $out);
+					if ($out->getName()) $this->namedRoutes->set($out->getName(), $out);
 
 					$p[] = $out;
 				}
