@@ -12,7 +12,7 @@ class InternalServerErrorException extends HttpException
 
 	public function getResponse(): Response
 	{
-		return new Response('Error 500 | Internal Server Error', null, self::STATUS);
+		return new Response('Error 500 | Internal Server Error', self::STATUS);
 	}
 
 }
