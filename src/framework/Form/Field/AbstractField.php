@@ -13,6 +13,12 @@ class AbstractField
 
 	private mixed $value;
 
+	/**
+	 * Name is HTML attribute allow PHP to create $_POST associated array with name and value of field
+	 * @var string
+	 */
+	private string $name;
+
 	private array $options = [];
 
 	private array $availableOptions = [
@@ -82,15 +88,15 @@ class AbstractField
 		return $this->error;
 	}
 
-	public function hasError(): bool
-	{
-		return !empty($this->error);
-	}
-
 	public function setError(array $error): AbstractField
 	{
 		$this->error = $error;
 		return $this;
+	}
+
+	public function hasError(): bool
+	{
+		return !empty($this->error);
 	}
 
 	public function getProperty(): \ReflectionProperty
@@ -107,6 +113,17 @@ class AbstractField
 	public function getAvailableOptions(): array
 	{
 		return $this->availableOptions;
+	}
+
+	public function getName(): string
+	{
+		return $this->name;
+	}
+
+	public function setName(string $name): AbstractField
+	{
+		$this->name = $name;
+		return $this;
 	}
 
 }
