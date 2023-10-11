@@ -182,9 +182,7 @@ class Router
 			$match = preg_match_all($route->getPattern(), $request->uri, $matches);
 			if ($match === 0) continue;
 
-			if (!$route->isValidMethod($request->method)) {
-				throw new MethodNotAllowedException("Method {$request->method->value} not allowed.");
-			}
+			if (!$route->isValidMethod($request->method)) continue;
 
 			/** @var RouteParam $attr */
 			foreach ($route->getParameters() as $attr) {
