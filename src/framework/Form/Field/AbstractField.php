@@ -100,6 +100,11 @@ class AbstractField
 		return $this->options;
 	}
 
+	public function getOption(string $key): array|string|null
+	{
+		return $this->options[$key] ?? null;
+	}
+
 	public function setOptions(array $options): AbstractField
 	{
 		$this->options = $options;
