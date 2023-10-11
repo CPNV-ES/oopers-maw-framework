@@ -4,7 +4,7 @@ namespace MVC\Form;
 
 use MVC\Http\Request;
 
-class AbstractForm
+abstract class AbstractForm
 {
 
 	private string $entity_name;
@@ -21,6 +21,8 @@ class AbstractForm
 		$this->entity = $entity;
 		$this->request = $request;
 	}
+
+	abstract public function buildForm(): void;
 
 	public function addOption(string $key, string $value): self
 	{
