@@ -41,9 +41,9 @@ abstract class Controller
      */
     protected function redirectToRoute(string $routeName, ?array $routeParams = null,bool $permanent = false): Response
     {
-        return $this->redirect(Kernel::url($routeName,$routeParams));
+        return $this->redirect(Kernel::url($routeName,$routeParams),$permanent);
     }
-    
+
     /**
      * Generate a redirection response
     * @param string $urlToRedirect The desired url to redirect
