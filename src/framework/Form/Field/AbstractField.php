@@ -73,6 +73,8 @@ class AbstractField
 		return $this;
 	}
 
+	abstract public function render(): string;
+
 	public function getId(): string
 	{
 		return $this->id;
@@ -100,15 +102,15 @@ class AbstractField
 		return $this->options;
 	}
 
-	public function getOption(string $key): array|string|null
-	{
-		return $this->options[$key] ?? null;
-	}
-
 	public function setOptions(array $options): AbstractField
 	{
 		$this->options = $options;
 		return $this;
+	}
+
+	public function getOption(string $key): array|string|null
+	{
+		return $this->options[$key] ?? null;
 	}
 
 	public function addOption(string $key, array|string $option): AbstractField
