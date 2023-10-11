@@ -13,9 +13,20 @@ class AbstractField
 
 	private mixed $value;
 
-	public function __construct(string $id, mixed $value) {
+	private array $options = [
+		'label' => [
+			'value' => 'Text Field',
+			'class' => []
+		],
+		'class' => [],
+	];
+
+	private \ReflectionProperty $property;
+
+	public function __construct(string $id, mixed $value, \ReflectionProperty $property) {
 		$this->id = $id;
 		$this->value = $value;
+		$this->property = $property;
 	}
 
 
