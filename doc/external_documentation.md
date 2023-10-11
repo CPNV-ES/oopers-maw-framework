@@ -67,6 +67,7 @@ To define a route, you can add a Route annotation to any methods on a Controller
 You can add a '[:name]' to capture a part of the url as a parameter for the method.
 ```php
 <?php
+namespace App\Controller;
 
 use MVC\Http\Controller\Controller;
 use MVC\Http\Routing\Annotation\Route;
@@ -74,7 +75,7 @@ use MVC\Http\Routing\Annotation\Route;
 class HomeController extends Controller
 {
     #[Route("/users/[:id]")]
-    function getUser($id)
+    public function getUser($id)
     {
         return $this->render('test');
     }
@@ -91,6 +92,7 @@ You can define your custom response for any HTTP Errors that are thrown by using
 
 ```php
 <?php
+namespace App\Controller;
 
 use MVC\Http\Controller\Controller;
 use MVC\Http\HTTPStatus;
@@ -100,7 +102,7 @@ use MVC\Http\Response\Response;
 class ErrorController extends Controller
 {
     #[ErrorRoute(HTTPStatus::NOT_FOUND)]
-    function notFound()
+    public function notFound()
     {
         return new Response("404 CUSTOM HTML!", HTTPStatus::NOT_FOUND);
     }
