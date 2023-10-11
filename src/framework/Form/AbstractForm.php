@@ -12,5 +12,10 @@ class AbstractForm
 	private array $options = [];
 	private Request $request;
 
+	public function __construct(object $entity, Request $request) {
+		$this->entity = $entity;
+		$this->request = $request;
+	}
+
 
 }
