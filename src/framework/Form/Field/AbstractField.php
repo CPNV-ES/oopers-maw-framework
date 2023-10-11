@@ -21,9 +21,12 @@ class AbstractField
 		'class' => [],
 	];
 
+	private array $error = [];
+
 	private \ReflectionProperty $property;
 
-	public function __construct(string $id, mixed $value, \ReflectionProperty $property) {
+	public function __construct(string $id, mixed $value, \ReflectionProperty $property)
+	{
 		$this->id = $id;
 		$this->value = $value;
 		$this->property = $property;
