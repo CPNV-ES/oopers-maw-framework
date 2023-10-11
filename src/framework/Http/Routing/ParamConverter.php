@@ -2,6 +2,8 @@
 
 namespace MVC\Http\Routing;
 
+use App\Kernel;
+use MVC\Container;
 use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 
@@ -38,7 +40,7 @@ class ParamConverter
 			} else {
 				$past[$item->getName()] = match ($item->getType()->getName()) {
 					HTTPStatus::class => $this->convertStatus($item->getName()),
-					default => throw new \Exception("ParamConverter cannot interpret `{$item->getName()}` parameter")
+					default => Kernel::getInstance()->container->get($item->getType()->getName())
 				};
 			}
 

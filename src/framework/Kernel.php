@@ -9,6 +9,7 @@ use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Http\Routing\Route;
 use MVC\Http\Routing\Router;
+use MVC\Service\ContainerServices;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -21,9 +22,12 @@ class Kernel
 	use Singleton;
 
 	private Router $router;
+	public Container $container;
 
     public function __construct(string $envPath)
     {
+		self::$_instance = $this;
+
 		$dotenv = new Dotenv();
 		$dotenv->load($envPath);
 
@@ -46,10 +50,14 @@ class Kernel
 			if($_ENV['APP_ENV'] === 'DEV') dd($error);
         	(new Http\Exception\InternalServerErrorException)->getResponse()->execute();
         }
+
     }
 
 	private function init(): self
 	{
+		$this->container = new Container();
+		ContainerServices::containerInit($this->container);
+		$this->container->setInstance(__CLASS__, $this);
 		$this->router = new Router();
 		return $this;
 	}
