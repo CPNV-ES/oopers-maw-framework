@@ -22,5 +22,11 @@ class AbstractForm
 		$this->request = $request;
 	}
 
+	public function addOption(string $key, string $value): self
+	{
+		$this->options[$key] = $value;
+		return $this;
+	}
+
 
 }
