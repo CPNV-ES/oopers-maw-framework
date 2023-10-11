@@ -13,12 +13,12 @@ class AbstractField
 
 	private mixed $value;
 
-	private array $options = [
-		'label' => [
-			'value' => 'Text Field',
-			'class' => []
-		],
-		'class' => [],
+	private array $options = [];
+
+	private array $availableOptions = [
+		'label',
+		'class',
+		'constraints',
 	];
 
 	private array $error = [];
@@ -98,5 +98,9 @@ class AbstractField
 		return $this;
 	}
 
+	public function getAvailableOptions(): array
+	{
+		return $this->availableOptions;
+	}
 
 }
