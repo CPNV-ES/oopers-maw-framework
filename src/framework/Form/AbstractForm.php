@@ -38,17 +38,6 @@ abstract class AbstractForm
 		return $this;
 	}
 
-	public function getEntity(): object
-	{
-		return $this->entity;
-	}
-
-	public function setEntity(object $entity): AbstractForm
-	{
-		$this->entity = $entity;
-		return $this;
-	}
-
 	public function getOptions(): array
 	{
 		return $this->options;
@@ -96,6 +85,17 @@ abstract class AbstractForm
 	protected function add(string $property, string $type, array $options = []): AbstractForm
 	{
 		$this->fields[] = AbstractField::createFromFormBuilder($property, $type, $this->getEntity(), $options);
+		return $this;
+	}
+
+	public function getEntity(): object
+	{
+		return $this->entity;
+	}
+
+	public function setEntity(object $entity): AbstractForm
+	{
+		$this->entity = $entity;
 		return $this;
 	}
 
