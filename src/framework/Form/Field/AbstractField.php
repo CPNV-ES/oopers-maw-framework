@@ -71,6 +71,12 @@ class AbstractField
 		return $this;
 	}
 
+	public function mergeOptions(array $options): AbstractField
+	{
+		$this->options = array_merge_recursive($this->options, $options);
+		return $this;
+	}
+
 	public function getError(): array
 	{
 		return $this->error;
