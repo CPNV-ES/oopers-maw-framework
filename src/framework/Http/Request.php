@@ -61,6 +61,10 @@ class Request
 	{
 		$uri = explode('?',$_SERVER['REQUEST_URI'])[0];
 		$method = HTTPMethod::from($_SERVER['REQUEST_METHOD']);
+
+        if ($method == HTTPMethod::POST && isset($_POST["_method"])) {
+            $method = HTTPMethod::tryFrom(mb_strtoupper($_POST["_method"])) ?? HTTPMethod::POST;
+        }
 		$req = (new Request($uri))
 			->setMethod($method)
 		;
