@@ -2,6 +2,9 @@
 
 namespace MVC\Form\Field;
 
+use MVC\Form\FormException;
+use function PHPUnit\Framework\returnArgument;
+
 class AbstractField
 {
 
@@ -36,6 +39,38 @@ class AbstractField
 		$this->id = $id;
 		$this->value = $value;
 		$this->property = $property;
+	}
+
+	public static function createFromFormBuilder(string $property, string $type, object $entity, array $options = []): self
+	{
+		if (!$type instanceof AbstractField) throw new FormException("Unable to use `$type` as form field.");
+		$propertyReflection = new \ReflectionProperty($entity, $property);
+		$camelCase = str_replace(['_'], [''], ucwords($property, "\t\r\n\f\v_"));
+		if (!$propertyReflection->getDeclaringClass()->hasMethod('get' . $camelCase)) throw new FormException("Unable to find getter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
+		if (!$propertyReflection->getDeclaringClass()->hasMethod('set' . $camelCase)) throw new FormException("Unable to find setter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
+
+		return (new $type)
+			->mergeOptions($options)
+			->setProperty($propertyReflection)
+			->setValue($propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity))
+			->setId(uniqid($property . '_'));
+	}
+
+	public function getName(): string
+	{
+		return $this->name;
+	}
+
+	public function setName(string $name): AbstractField
+	{
+		$this->name = $name;
+		return $this;
+	}
+
+	public function mergeOptions(array $options): AbstractField
+	{
+		$this->options = array_merge_recursive($this->options, $options);
+		return $this;
 	}
 
 	public function getId(): string
@@ -77,12 +112,6 @@ class AbstractField
 		return $this;
 	}
 
-	public function mergeOptions(array $options): AbstractField
-	{
-		$this->options = array_merge_recursive($this->options, $options);
-		return $this;
-	}
-
 	public function getError(): array
 	{
 		return $this->error;
@@ -113,17 +142,6 @@ class AbstractField
 	public function getAvailableOptions(): array
 	{
 		return $this->availableOptions;
-	}
-
-	public function getName(): string
-	{
-		return $this->name;
-	}
-
-	public function setName(string $name): AbstractField
-	{
-		$this->name = $name;
-		return $this;
 	}
 
 }
