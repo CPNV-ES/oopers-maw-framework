@@ -48,9 +48,9 @@ class Context implements ContextInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function __get(string $key)
+	public function __get(string $key): mixed
 	{
-		if (!array_key_exists($key, $this->vars)) throw new ViewException("Unable to retrieve `$key` item in context view.");
+		if (!array_key_exists($key, $this->vars)) return null;
 		return $this->vars[$key];
 	}
 }
