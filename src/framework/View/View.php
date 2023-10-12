@@ -3,8 +3,10 @@
 namespace MVC\View;
 
 use MVC\Kernel;
-use MVC\View\ViewInterface;
 
+/**
+ * Class used represent a view and render using ob PHP functions
+ */
 class View implements ViewInterface
 {
 
