@@ -16,11 +16,25 @@ interface ContextInterface
 	public function url(string $route, array $params = []): string;
 
 	/**
+	 * Add var to context registry
+	 * @param array $vars
+	 * @return $this
+	 */
+	public function add(array $vars): ContextInterface;
+
+	/**
+	 * Define vars
+	 * @param array $vars
+	 * @return $this
+	 */
+	public function setVars(array $vars): ContextInterface;
+
+	/**
 	 * Resolve item stored in context
 	 * @param string $key
 	 * @return mixed
 	 */
-	public function __get(string $key);
+	public function __get(string $key): mixed;
 
 
 }
