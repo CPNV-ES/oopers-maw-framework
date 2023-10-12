@@ -2,6 +2,7 @@
 
 namespace MVC\View;
 
+use MVC\Kernel;
 use MVC\View\ViewInterface;
 
 class View implements ViewInterface
@@ -18,6 +19,22 @@ class View implements ViewInterface
 
 	public function render(array $context = []): string
 	{
-		// TODO: Implement render() method.
+		extract($context);
+		$path = $this->views_path;
+
+		$path = str_replace(['.'], ['/'], Kernel::kernelVarsToString($path . $this->template));
+
+		if (!str_ends_with($this->template, '.php')) {
+			$path .= '.php';
+		}
+
+		try {
+			ob_start();
+			require $path;
+			$content = ob_get_clean();
+		} catch (\Throwable $e) {
+			return "Unable to render view";
+		}
+		return $content;
 	}
 }
