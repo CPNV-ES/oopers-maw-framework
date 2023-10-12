@@ -7,11 +7,13 @@ use MVC\View\ViewInterface;
 class View implements ViewInterface
 {
 
-	private string $view_path;
+	protected ?string $views_path = '%kernel.project_dir%/views/';
 
-	public function __construct(string $view_path)
+	private string $template;
+
+	public function __construct(string $template)
 	{
-		$this->view_path = $view_path;
+		$this->template = $template;
 	}
 
 	public function render(array $context = []): string
