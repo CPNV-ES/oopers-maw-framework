@@ -8,12 +8,6 @@ interface ContextInterface
 {
 
 	/**
-	 * Used to resolve current request
-	 * @return Request
-	 */
-	public function getRequest(): Request;
-
-	/**
 	 * Generate url from path name
 	 * @param string $route
 	 * @param array $params
@@ -26,7 +20,7 @@ interface ContextInterface
 	 * @param string $key
 	 * @return mixed
 	 */
-	public function get(string $key): mixed;
+	public function __get(string $key);
 
 
 }
