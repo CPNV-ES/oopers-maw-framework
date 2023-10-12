@@ -19,7 +19,7 @@ interface ContextInterface
 	 * @param array $params
 	 * @return string
 	 */
-	public function path(string $route, array $params = []): string;
+	public function url(string $route, array $params = []): string;
 
 	/**
 	 * Resolve item stored in context
