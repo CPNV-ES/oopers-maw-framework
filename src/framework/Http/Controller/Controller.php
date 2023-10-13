@@ -6,6 +6,8 @@ use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Http\Response\Response;
 use MVC\Kernel;
+use MVC\View\Context;
+use MVC\View\ContextInterface;
 use MVC\View\View;
 
 /**
@@ -17,10 +19,14 @@ abstract class Controller
 	protected ?string $layout = 'base';
 	protected ?string $viewPath = '%kernel.project_dir%/views/';
 
+	protected ContextInterface $context;
+
 	public function __construct(
 		protected Request $request,
 	)
 	{
+		$this->context = new Context();
+		$this->context->request = $this->request;
 	}
 
 	protected function getPathOfView(string $name): string
@@ -47,7 +53,7 @@ abstract class Controller
 	 * @param array $content
 	 * @return string
 	 */
-	public function renderView(string $view, array $content = []): string
+	public function renderView(string $view, ContextInterface|array $content = []): string
 	{
 		$content = (new View($view))->render($content);
 		if ($this->layout) {
