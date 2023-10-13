@@ -14,7 +14,7 @@ class View implements ViewInterface
 
 	private string $template;
 
-	private Context $context;
+	private ?ContextInterface $context;
 
 	public function __construct(string $template, ?ContextInterface $context = null)
 	{
@@ -22,9 +22,14 @@ class View implements ViewInterface
 		$this->context = $context;
 	}
 
-	public function render(array $context = []): string
+	public function render(Context|array $context = []): string
 	{
-		extract($context);
+		if (is_array($context) && is_null($this->context)) {
+			$context = (new Context())->setVars($context);
+		} elseif(is_array($context) && !is_null($this->context)) {
+			$context = $this->context->mergeVars($context);
+		}
+
 		$path = $this->views_path;
 
 		$path = str_replace(['.'], ['/'], Kernel::kernelVarsToString($path . $this->template));
