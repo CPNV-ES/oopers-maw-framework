@@ -125,6 +125,21 @@ public function showUser($id)
 ```
 Note : by default, the status is 200 (ok) but you can specify any other with the last argument of render.
 
+### Customize views paths
+To change views directory nor your layout for your application. By declaring `$layout` and `$viewPath` in your controller define which file to use for layout and where are stored views files. Here is an example of a global controller to customize all views setting of children's classes :
+
+```php
+// src/Controller/AppController.php
+class AppController extends Controller
+{
+    protected ?string $layout = 'base';
+    protected ?string $viewPath = '%kernel.project_dir%/views/';
+}
+
+// src/Controller/UserController.php
+class UserController extends AppController {...}
+```
+
 ## Development
 While you're in development, you can add 'APP_ENV=DEV' to your .env to get meaningful errors. 
 ```dotenv
