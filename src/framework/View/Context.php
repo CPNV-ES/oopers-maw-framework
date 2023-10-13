@@ -48,6 +48,16 @@ class Context implements ContextInterface
 	/**
 	 * @inheritDoc
 	 */
+	public function toArray(): array
+	{
+		$out = $this->vars;
+		$out['request'] = $this->request;
+		return $out;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function __get(string $key): mixed
 	{
 		if (!array_key_exists($key, $this->vars)) return null;

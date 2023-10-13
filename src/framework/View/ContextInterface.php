@@ -23,6 +23,13 @@ interface ContextInterface
 	public function add(array $vars): ContextInterface;
 
 	/**
+	 * Retrieve all vars
+	 * @param array $vars
+	 * @return array
+	 */
+	public function toArray(): array;
+
+	/**
 	 * Define vars
 	 * @param array $vars
 	 * @return $this
