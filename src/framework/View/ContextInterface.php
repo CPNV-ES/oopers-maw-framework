@@ -24,10 +24,16 @@ interface ContextInterface
 
 	/**
 	 * Retrieve all vars
-	 * @param array $vars
 	 * @return array
 	 */
 	public function toArray(): array;
+
+	/**
+	 * Merge vars array
+	 * @param array $vars
+	 * @return ContextInterface
+	 */
+	public function mergeVars(array $vars): ContextInterface;
 
 	/**
 	 * Define vars

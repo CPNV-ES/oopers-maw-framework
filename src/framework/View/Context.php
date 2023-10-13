@@ -63,4 +63,12 @@ class Context implements ContextInterface
 		if (!array_key_exists($key, $this->vars)) return null;
 		return $this->vars[$key];
 	}
+
+	public function mergeVars(array $vars): Context
+	{
+		$this->vars = array_merge_recursive($this->vars, $vars);
+		return $this;
+	}
+
+
 }
