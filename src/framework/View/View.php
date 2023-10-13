@@ -14,9 +14,12 @@ class View implements ViewInterface
 
 	private string $template;
 
-	public function __construct(string $template)
+	private Context $context;
+
+	public function __construct(string $template, ?ContextInterface $context = null)
 	{
 		$this->template = $template;
+		$this->context = $context;
 	}
 
 	public function render(array $context = []): string
@@ -38,5 +41,16 @@ class View implements ViewInterface
 			return "Unable to render view";
 		}
 		return $content;
+	}
+
+	public function __toString(): string
+	{
+		return $this->render();
+	}
+
+	public function setContext(ContextInterface $context): ViewInterface
+	{
+		$this->context = $context;
+		return $this;
 	}
 }

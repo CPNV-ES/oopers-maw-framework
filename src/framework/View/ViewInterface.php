@@ -5,8 +5,7 @@ namespace MVC\View;
 interface ViewInterface
 {
 
-	public function __construct(string $template);
-
+	public function __construct(string $template, ?ContextInterface $context);
 
 	/**
 	 * Method that return an HTML string got from path view and construction
@@ -14,6 +13,13 @@ interface ViewInterface
 	 * @return string
 	 */
 	public function render(array $context = []): string;
+
+	/**
+	 * Define context of a view
+	 * @param ContextInterface $context
+	 * @return ViewInterface
+	 */
+	public function setContext(ContextInterface $context): ViewInterface;
 
 	/**
 	 * Alias to render executed when class is invoke as string
