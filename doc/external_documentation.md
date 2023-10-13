@@ -8,8 +8,8 @@ Add the GitHub repository to your composer.json
 ```json
 "repositories": [
     {
-    "type": "vcs",
-    "url": "https://github.com/CPNV-ES/oopers-maw-framework"
+      "type": "vcs",
+      "url": "https://github.com/CPNV-ES/oopers-maw-framework"
     }
 ]
 ```
@@ -45,15 +45,12 @@ new \MVC\Kernel("../.env");
 ## Structure
 
 - **src/**
-    - Controller/
-            
-            All controllers from the App will be put here. 
-- **views/**
-
-            All views will be put here. (Or in a sub folder)
-    - templates/
-
-            All layouts will be put here. (Or in a sub folder)
+    - Controller \
+      _All controllers from the App will be put here._
+- **views/** \
+  _All views will be put here. (Or in a sub folder)_
+  - templates/ \
+    _All layouts will be put here. (Or in a sub folder)_
 
 ## Controllers
 All the Classes that **inherit** from MVC\Http\Controller\Controller **inside the src/Controller folder** (namespace App/Controller) will be taken in consideration when building routes.
@@ -75,7 +72,7 @@ use MVC\Http\Routing\Annotation\Route;
 class HomeController extends Controller
 {
     #[Route("/users/[:id]")]
-    public function getUser($id)
+    public function showUser($id)
     {
         return $this->render('test');
     }
@@ -83,7 +80,7 @@ class HomeController extends Controller
 ```
 You can specify the HTTP methods allowed to use a specific route.
 ```php
-#[Route("/users/[:id]",methods: [HTTPMethod::GET,HTTPMethod::POST])]
+#[Route("/users/[:id]", methods: [HTTPMethod::GET, HTTPMethod::POST])]
 ```
 
 ### Errors route and manual response
@@ -108,7 +105,7 @@ class ErrorController extends Controller
     }
 }
 ```
-Note : You don't have to use the render method. You can also choose to build the answer yourself!
+Note : You don't have to use the render method. You can also choose to build the response yourself!
 
 ## Views
 To render a view, you can call the render method from any controller (which will return a response). 
@@ -121,9 +118,9 @@ You can change this parameter by setting the 'layout' property.
 To pass values inside the view, you can add a parameter (named content) inside which you can pass all useful information to the view in the form of an array.
 ```php
 #[Route("/users/[:id]")]
-function getUser($id)
+public function showUser($id)
 {
-    return $this->render('user',["title"=>"User page"],HTTPStatus::OK);
+    return $this->render('user', ["title"=>"User page"], HTTPStatus::OK);
 }
 ```
 Note : by default, the status is 200 (ok) but you can specify any other with the last argument of render.
