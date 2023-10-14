@@ -55,6 +55,11 @@ abstract class AbstractForm
 		return $this;
 	}
 
+	public function getOption(string $key): mixed
+	{
+		return $this->options[$key];
+	}
+
 	public function getRequest(): Request
 	{
 		return $this->request;
