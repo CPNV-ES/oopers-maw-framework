@@ -5,7 +5,7 @@ namespace MVC\Form\Field;
 use MVC\Form\FormException;
 use function PHPUnit\Framework\returnArgument;
 
-class AbstractField
+abstract class AbstractField
 {
 
 	/**
