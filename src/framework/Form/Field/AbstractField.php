@@ -113,7 +113,7 @@ abstract class AbstractField
 		return $this->options[$key] ?? null;
 	}
 
-	public function addOption(string $key, array|string $option): AbstractField
+	public function setOption(string $key, array|string $option): AbstractField
 	{
 		$this->options[$key] = $option;
 		return $this;
