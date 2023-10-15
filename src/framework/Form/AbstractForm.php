@@ -82,6 +82,11 @@ abstract class AbstractForm
 		return $this->fields;
 	}
 
+	public function getField(string $key): AbstractField
+	{
+		return $this->fields[$key];
+	}
+
 	public function setFields(array $fields): AbstractForm
 	{
 		$this->fields = $fields;
