@@ -3,6 +3,7 @@
 namespace MVC\Form;
 
 use MVC\Form\Field\AbstractField;
+use MVC\Http\HTTPMethod;
 use MVC\Http\Request;
 
 abstract class AbstractForm
@@ -89,7 +90,8 @@ abstract class AbstractForm
 
 	protected function add(string $property, string $type, array $options = []): AbstractForm
 	{
-		$this->fields[] = AbstractField::createFromFormBuilder($property, $type, $this->getEntity(), $options);
+		$field = AbstractField::createFromFormBuilder($property, $type, $this->getEntity(), $options);
+		$this->fields[$field->getName()] = $field;
 		return $this;
 	}
 
@@ -102,6 +104,17 @@ abstract class AbstractForm
 	{
 		$this->entity = $entity;
 		return $this;
+	}
+
+	public function isSubmitted(): bool
+	{
+		if ($this->getRequest()->method === HTTPMethod::POST) {
+			$formKeys = array_keys($this->fields);
+			foreach ($formKeys as $formKey) {
+				if (!array_key_exists($formKey, $this->getRequest()->data->toArray())) return false;
+			}
+		}
+		return true;
 	}
 
 
