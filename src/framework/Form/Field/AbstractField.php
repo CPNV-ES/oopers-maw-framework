@@ -26,7 +26,7 @@ abstract class AbstractField
 
 	private array $availableOptions = [
 		'label',
-		'class',
+		'attributes',
 		'constraints',
 	];
 
@@ -43,17 +43,16 @@ abstract class AbstractField
 
 	public static function createFromFormBuilder(string $property, string $type, object $entity, array $options = []): self
 	{
-		if (!$type instanceof AbstractField) throw new FormException("Unable to use `$type` as form field.");
+		if (!is_subclass_of($type, AbstractField::class)) throw new FormException("Unable to use `$type` as form field.");
 		$propertyReflection = new \ReflectionProperty($entity, $property);
 		$camelCase = str_replace(['_'], [''], ucwords($property, "\t\r\n\f\v_"));
 		if (!$propertyReflection->getDeclaringClass()->hasMethod('get' . $camelCase)) throw new FormException("Unable to find getter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
 		if (!$propertyReflection->getDeclaringClass()->hasMethod('set' . $camelCase)) throw new FormException("Unable to find setter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
 
-		return (new $type)
+		return (new $type(uniqid($property . '_'), $propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity), $propertyReflection))
+			->setName($property)
 			->mergeOptions($options)
-			->setProperty($propertyReflection)
-			->setValue($propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity))
-			->setId(uniqid($property . '_'));
+		;
 	}
 
 	public function getName(): string
@@ -135,6 +134,11 @@ abstract class AbstractField
 		return !empty($this->error);
 	}
 
+	public function getErrorMessage(): string
+	{
+		return $this->getError()['message'];
+	}
+
 	public function getProperty(): \ReflectionProperty
 	{
 		return $this->property;
@@ -149,6 +153,24 @@ abstract class AbstractField
 	public function getAvailableOptions(): array
 	{
 		return $this->availableOptions;
+	}
+
+	public function getLabel(): string
+	{
+		return is_array($this->getOption('label')) ? $this->getOption('label')['text'] : $this->getOption('label');
+	}
+
+	public function getAttributes(): string
+	{
+		$out = "";
+		foreach ($this->getOption('attributes') as $key => $item) {
+			if (is_array($item)) {
+				$out .= "$key=\"". implode(" ", $item) . "\"";
+			} else {
+				$out .= "$key=\"$item\"";
+			}
+		}
+		return $out;
 	}
 
 }
