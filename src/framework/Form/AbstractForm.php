@@ -13,6 +13,13 @@ abstract class AbstractForm
 	protected array $fields = [];
 	private string $entity_name;
 	private object $entity;
+
+	/**
+	 * @var array{
+	 *     view_template: string,
+	 *     action_route: ?string,
+	 * }
+	 */
 	private array $options = [];
 	private Request $request;
 	private array $default_options = [
@@ -61,17 +68,6 @@ abstract class AbstractForm
 		return $this->options[$key];
 	}
 
-	public function getRequest(): Request
-	{
-		return $this->request;
-	}
-
-	public function setRequest(Request $request): AbstractForm
-	{
-		$this->request = $request;
-		return $this;
-	}
-
 	public function getDefaultOptions(): array
 	{
 		return $this->default_options;
@@ -82,14 +78,36 @@ abstract class AbstractForm
 		return $this->fields;
 	}
 
+	public function setFields(array $fields): AbstractForm
+	{
+		$this->fields = $fields;
+		return $this;
+	}
+
 	public function getField(string $key): AbstractField
 	{
 		return $this->fields[$key];
 	}
 
-	public function setFields(array $fields): AbstractForm
+	public function isSubmitted(): bool
 	{
-		$this->fields = $fields;
+		if ($this->getRequest()->method === HTTPMethod::POST) {
+			$formKeys = array_keys($this->fields);
+			foreach ($formKeys as $formKey) {
+				if (!array_key_exists($formKey, $this->getRequest()->data->toArray())) return false;
+			}
+		}
+		return true;
+	}
+
+	public function getRequest(): Request
+	{
+		return $this->request;
+	}
+
+	public function setRequest(Request $request): AbstractForm
+	{
+		$this->request = $request;
 		return $this;
 	}
 
@@ -109,17 +127,6 @@ abstract class AbstractForm
 	{
 		$this->entity = $entity;
 		return $this;
-	}
-
-	public function isSubmitted(): bool
-	{
-		if ($this->getRequest()->method === HTTPMethod::POST) {
-			$formKeys = array_keys($this->fields);
-			foreach ($formKeys as $formKey) {
-				if (!array_key_exists($formKey, $this->getRequest()->data->toArray())) return false;
-			}
-		}
-		return true;
 	}
 
 
