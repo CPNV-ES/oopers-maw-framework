@@ -3,7 +3,7 @@
 namespace MVC\Form\Field;
 
 use MVC\Form\FormException;
-use function PHPUnit\Framework\returnArgument;
+use MVC\View\View;
 
 abstract class AbstractField
 {
@@ -72,7 +72,11 @@ abstract class AbstractField
 		return $this;
 	}
 
-	abstract public function render(): string;
+	public function render(): string
+	{
+		$view = new View($this->getOption('view_template'));
+		return $view->render(['field' => $this]);
+	}
 
 	public function getId(): string
 	{

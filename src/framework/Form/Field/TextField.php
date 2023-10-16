@@ -13,10 +13,4 @@ class TextField extends AbstractField
 		$this->setOption('attributes', ['class' => ['form-input']]);
 		$this->setOption('view_template', 'form.text-field');
 	}
-
-	public function render(): string
-	{
-		$view = new View($this->getOption('view_template'));
-		return $view->render(['field' => $this]);
-	}
 }
