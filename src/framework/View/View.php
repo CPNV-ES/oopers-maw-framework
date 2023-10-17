@@ -12,14 +12,14 @@ class View implements ViewInterface
 
 	protected ?string $views_path = '%kernel.project_dir%/views/';
 
-	private string $template;
+	protected string $template;
 
-	private ?ContextInterface $context;
+	protected ?ContextInterface $context;
 
 	public function __construct(string $template, ?ContextInterface $context = null)
 	{
 		$this->template = $template;
-		$this->context = $context;
+		$this->context = $context ?? new Context();
 	}
 
 	public function render(Context|array $context = []): string
