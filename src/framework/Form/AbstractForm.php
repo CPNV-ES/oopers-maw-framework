@@ -31,9 +31,24 @@ abstract class AbstractForm
 	{
 		$this->entity = $entity;
 		$this->request = $request;
+		$this->defaultOptions();
 	}
 
 	abstract public function buildForm(): void;
+
+	public function defaultOptions(): self
+	{
+		return $this
+			->addOption('method', 'POST')
+			->addOption('attributes', [])
+			->addOption('action_route', '')
+			;
+	}
+
+	public function renderView(): FormView
+	{
+		return FormView::createFromForm($this);
+	}
 
 	public function getEntityName(): string
 	{
@@ -57,7 +72,7 @@ abstract class AbstractForm
 		return $this;
 	}
 
-	public function addOption(string $key, string $value): self
+	public function addOption(string $key, mixed $value): self
 	{
 		$this->options[$key] = $value;
 		return $this;
@@ -65,7 +80,7 @@ abstract class AbstractForm
 
 	public function getOption(string $key): mixed
 	{
-		return $this->options[$key];
+		return $this->options[$key] ?? null;
 	}
 
 	public function getDefaultOptions(): array
@@ -96,8 +111,10 @@ abstract class AbstractForm
 			foreach ($formKeys as $formKey) {
 				if (!array_key_exists($formKey, $this->getRequest()->data->toArray())) return false;
 			}
+
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	public function getRequest(): Request
@@ -129,5 +146,17 @@ abstract class AbstractForm
 		return $this;
 	}
 
+	public function getAttributes(): string
+	{
+		$out = "";
+		foreach ($this->getOption('attributes') as $key => $item) {
+			if (is_array($item)) {
+				$out .= "$key=\"" . implode(" ", $item) . "\"";
+			} else {
+				$out .= "$key=\"$item\"";
+			}
+		}
+		return $out;
+	}
 
 }
