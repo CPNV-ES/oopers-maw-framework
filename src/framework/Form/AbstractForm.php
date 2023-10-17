@@ -34,16 +34,21 @@ abstract class AbstractForm
 		$this->defaultOptions();
 	}
 
-	abstract public function buildForm(): void;
-
 	public function defaultOptions(): self
 	{
 		return $this
 			->addOption('method', 'POST')
 			->addOption('attributes', [])
-			->addOption('action_route', '')
-			;
+			->addOption('action_route', '');
 	}
+
+	public function addOption(string $key, mixed $value): self
+	{
+		$this->options[$key] = $value;
+		return $this;
+	}
+
+	abstract public function buildForm(): void;
 
 	public function renderView(): FormView
 	{
@@ -70,17 +75,6 @@ abstract class AbstractForm
 	{
 		$this->options = $options;
 		return $this;
-	}
-
-	public function addOption(string $key, mixed $value): self
-	{
-		$this->options[$key] = $value;
-		return $this;
-	}
-
-	public function getOption(string $key): mixed
-	{
-		return $this->options[$key] ?? null;
 	}
 
 	public function getDefaultOptions(): array
@@ -128,6 +122,24 @@ abstract class AbstractForm
 		return $this;
 	}
 
+	public function getAttributes(): string
+	{
+		$out = "";
+		foreach ($this->getOption('attributes') as $key => $item) {
+			if (is_array($item)) {
+				$out .= "$key=\"" . implode(" ", $item) . "\"";
+			} else {
+				$out .= "$key=\"$item\"";
+			}
+		}
+		return $out;
+	}
+
+	public function getOption(string $key): mixed
+	{
+		return $this->options[$key] ?? null;
+	}
+
 	protected function add(string $property, string $type, array $options = []): AbstractForm
 	{
 		$field = AbstractField::createFromFormBuilder($property, $type, $this->getEntity(), $options);
@@ -144,19 +156,6 @@ abstract class AbstractForm
 	{
 		$this->entity = $entity;
 		return $this;
-	}
-
-	public function getAttributes(): string
-	{
-		$out = "";
-		foreach ($this->getOption('attributes') as $key => $item) {
-			if (is_array($item)) {
-				$out .= "$key=\"" . implode(" ", $item) . "\"";
-			} else {
-				$out .= "$key=\"$item\"";
-			}
-		}
-		return $out;
 	}
 
 }

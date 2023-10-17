@@ -2,8 +2,6 @@
 
 namespace MVC\Form\Field;
 
-use MVC\View\View;
-
 class TextField extends AbstractField
 {
 

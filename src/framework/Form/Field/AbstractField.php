@@ -71,17 +71,6 @@ abstract class AbstractField
 		return $this;
 	}
 
-	public function render(): string
-	{
-		$view = new View($this->getOption('view_template'));
-		return $view->render(['field' => $this]);
-	}
-
-	public function getOption(string $key): array|string|null
-	{
-		return $this->options[$key] ?? null;
-	}
-
 	public function getId(): string
 	{
 		return $this->id;
@@ -163,6 +152,11 @@ abstract class AbstractField
 		return is_array($this->getOption('label')) ? $this->getOption('label')['text'] : $this->getOption('label');
 	}
 
+	public function getOption(string $key): array|string|null
+	{
+		return $this->options[$key] ?? null;
+	}
+
 	public function getAttributes(): string
 	{
 		$out = "";
@@ -179,6 +173,12 @@ abstract class AbstractField
 	public function __toString(): string
 	{
 		return $this->render();
+	}
+
+	public function render(): string
+	{
+		$view = new View($this->getOption('view_template'));
+		return $view->render(['field' => $this]);
 	}
 
 }
