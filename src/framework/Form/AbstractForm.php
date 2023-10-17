@@ -27,10 +27,9 @@ abstract class AbstractForm
 		'action_route' => 'optional',
 	];
 
-	public function __construct(object $entity, Request $request)
+	public function __construct(object $entity)
 	{
 		$this->entity = $entity;
-		$this->request = $request;
 		$this->defaultOptions();
 	}
 
@@ -40,6 +39,13 @@ abstract class AbstractForm
 			->addOption('method', 'POST')
 			->addOption('attributes', [])
 			->addOption('action_route', '');
+	}
+
+	public function handleRequest(Request $request): self
+	{
+		$this->setRequest($request);
+
+		return $this;
 	}
 
 	public function addOption(string $key, mixed $value): self
@@ -100,6 +106,7 @@ abstract class AbstractForm
 
 	public function isSubmitted(): bool
 	{
+		if(!$this->request) throw new FormException("Cannot verify if submitted because no Request have been handled. Please use Form::handleRequest().");
 		if ($this->getRequest()->method === HTTPMethod::POST) {
 			$formKeys = array_keys($this->fields);
 			foreach ($formKeys as $formKey) {
