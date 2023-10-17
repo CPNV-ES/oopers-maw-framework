@@ -13,7 +13,7 @@ class Context implements ContextInterface
 {
 
 	public Request $request;
-	private array $vars;
+	private array $vars = [];
 
 	/**
 	 * @inheritDoc
