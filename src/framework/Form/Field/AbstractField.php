@@ -51,8 +51,7 @@ abstract class AbstractField
 
 		return (new $type(uniqid($property . '_'), $propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity), $propertyReflection))
 			->setName($property)
-			->mergeOptions($options)
-		;
+			->mergeOptions($options);
 	}
 
 	public function getName(): string
@@ -76,6 +75,11 @@ abstract class AbstractField
 	{
 		$view = new View($this->getOption('view_template'));
 		return $view->render(['field' => $this]);
+	}
+
+	public function getOption(string $key): array|string|null
+	{
+		return $this->options[$key] ?? null;
 	}
 
 	public function getId(): string
@@ -111,25 +115,9 @@ abstract class AbstractField
 		return $this;
 	}
 
-	public function getOption(string $key): array|string|null
-	{
-		return $this->options[$key] ?? null;
-	}
-
 	public function setOption(string $key, array|string $option): AbstractField
 	{
 		$this->options[$key] = $option;
-		return $this;
-	}
-
-	public function getError(): array
-	{
-		return $this->error;
-	}
-
-	public function setError(array $error): AbstractField
-	{
-		$this->error = $error;
 		return $this;
 	}
 
@@ -141,6 +129,17 @@ abstract class AbstractField
 	public function getErrorMessage(): string
 	{
 		return $this->getError()['message'];
+	}
+
+	public function getError(): array
+	{
+		return $this->error;
+	}
+
+	public function setError(array $error): AbstractField
+	{
+		$this->error = $error;
+		return $this;
 	}
 
 	public function getProperty(): \ReflectionProperty
@@ -169,12 +168,17 @@ abstract class AbstractField
 		$out = "";
 		foreach ($this->getOption('attributes') as $key => $item) {
 			if (is_array($item)) {
-				$out .= "$key=\"". implode(" ", $item) . "\"";
+				$out .= "$key=\"" . implode(" ", $item) . "\"";
 			} else {
 				$out .= "$key=\"$item\"";
 			}
 		}
 		return $out;
+	}
+
+	public function __toString(): string
+	{
+		return $this->render();
 	}
 
 }
