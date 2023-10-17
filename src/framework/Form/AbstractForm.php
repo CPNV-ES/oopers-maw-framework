@@ -30,6 +30,7 @@ abstract class AbstractForm
 	public function __construct(object $entity)
 	{
 		$this->entity = $entity;
+		$this->setEntityName(get_class($entity));
 		$this->defaultOptions();
 	}
 
