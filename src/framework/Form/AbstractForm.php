@@ -21,7 +21,7 @@ abstract class AbstractForm
 	 * }
 	 */
 	private array $options = [];
-	private Request $request;
+	private ?Request $request = null;
 	private array $default_options = [
 		'view_template' => 'required',
 		'action_route' => 'optional',
@@ -107,7 +107,7 @@ abstract class AbstractForm
 
 	public function isSubmitted(): bool
 	{
-		if(!$this->request) throw new FormException("Cannot verify if submitted because no Request have been handled. Please use Form::handleRequest().");
+		if(is_null($this->request)) throw new FormException("Cannot verify if submitted because no Request have been handled. Please use Form::handleRequest().");
 		if ($this->getRequest()->method === HTTPMethod::POST) {
 			$formKeys = array_keys($this->fields);
 			foreach ($formKeys as $formKey) {
