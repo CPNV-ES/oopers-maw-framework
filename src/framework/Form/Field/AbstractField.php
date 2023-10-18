@@ -37,6 +37,7 @@ abstract class AbstractField
 	private \ReflectionMethod $entityGetMethod;
 	private \ReflectionMethod $entitySetMethod;
 	private object $entity;
+	private bool $changes = false;
 
 	public function __construct(string $id, mixed $value, \ReflectionProperty $property, object $entity)
 	{
@@ -222,6 +223,28 @@ abstract class AbstractField
 	public function setEntity(object $entity): AbstractField
 	{
 		$this->entity = $entity;
+		return $this;
+	}
+
+	private function setEntityValue(mixed $value): self
+	{
+		$this->getEntitySetMethod()->invoke($this->getEntity(), $value);
+		return $this;
+	}
+
+	private function getEntityValue(): self
+	{
+		$this->getEntityGetMethod()->invoke($this->getEntity());
+		return $this;
+	}
+
+	private function updateEntity(): self
+	{
+		if ($this->getEntityValue() === $this->getValue()) return $this;
+		$this
+			->setEntityValue($this->getValue())
+			->changes = true;
+		;
 		return $this;
 	}
 
