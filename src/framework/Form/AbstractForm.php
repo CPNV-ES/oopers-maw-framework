@@ -42,17 +42,61 @@ abstract class AbstractForm
 			->addOption('action_route', '');
 	}
 
-	public function handleRequest(Request $request): self
-	{
-		$this->setRequest($request);
-
-		return $this;
-	}
-
 	public function addOption(string $key, mixed $value): self
 	{
 		$this->options[$key] = $value;
 		return $this;
+	}
+
+	public function handleRequest(Request $request): self
+	{
+		$this->setRequest($request);
+
+		if ($this->isSubmitted()) {
+			$this->bindRequest();
+		}
+
+		return $this;
+	}
+
+	public function isSubmitted(): bool
+	{
+		if (is_null($this->request)) throw new FormException("Cannot verify if submitted because no Request have been handled. Please use Form::handleRequest().");
+		if ($this->getRequest()->method === HTTPMethod::POST) {
+			$formKeys = array_keys($this->fields);
+			foreach ($formKeys as $formKey) {
+				if (!array_key_exists($formKey, $this->getRequest()->data->toArray())) return false;
+			}
+
+			return true;
+		}
+		return false;
+	}
+
+	public function getRequest(): Request
+	{
+		return $this->request;
+	}
+
+	public function setRequest(Request $request): AbstractForm
+	{
+		$this->request = $request;
+		return $this;
+	}
+
+	private function bindRequest(): self
+	{
+		foreach ($this->request->data as $key => $data) {
+			if (!array_key_exists($key, $this->fields)) continue;
+			$field = $this->getField($key);
+			$field->setValue($data);
+		}
+		return $this;
+	}
+
+	public function getField(string $key): AbstractField
+	{
+		return $this->fields[$key];
 	}
 
 	abstract public function buildForm(): void;
@@ -89,6 +133,14 @@ abstract class AbstractForm
 		return $this->default_options;
 	}
 
+	public function isValid(): bool
+	{
+		return array_reduce($this->getFields(), function ($past, $current) {
+			if (!$past) return false;
+			return !$current->hasError();
+		}, true);
+	}
+
 	public function getFields(): array
 	{
 		return $this->fields;
@@ -97,36 +149,6 @@ abstract class AbstractForm
 	public function setFields(array $fields): AbstractForm
 	{
 		$this->fields = $fields;
-		return $this;
-	}
-
-	public function getField(string $key): AbstractField
-	{
-		return $this->fields[$key];
-	}
-
-	public function isSubmitted(): bool
-	{
-		if(is_null($this->request)) throw new FormException("Cannot verify if submitted because no Request have been handled. Please use Form::handleRequest().");
-		if ($this->getRequest()->method === HTTPMethod::POST) {
-			$formKeys = array_keys($this->fields);
-			foreach ($formKeys as $formKey) {
-				if (!array_key_exists($formKey, $this->getRequest()->data->toArray())) return false;
-			}
-
-			return true;
-		}
-		return false;
-	}
-
-	public function getRequest(): Request
-	{
-		return $this->request;
-	}
-
-	public function setRequest(Request $request): AbstractForm
-	{
-		$this->request = $request;
 		return $this;
 	}
 
