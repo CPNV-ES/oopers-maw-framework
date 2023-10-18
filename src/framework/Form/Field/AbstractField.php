@@ -34,11 +34,16 @@ abstract class AbstractField
 
 	private \ReflectionProperty $property;
 
-	public function __construct(string $id, mixed $value, \ReflectionProperty $property)
+	private \ReflectionMethod $entityGetMethod;
+	private \ReflectionMethod $entitySetMethod;
+	private object $entity;
+
+	public function __construct(string $id, mixed $value, \ReflectionProperty $property, object $entity)
 	{
 		$this->id = $id;
 		$this->value = $value;
 		$this->property = $property;
+		$this->entity = $entity;
 	}
 
 	public static function createFromFormBuilder(string $property, string $type, object $entity, array $options = []): self
@@ -49,8 +54,10 @@ abstract class AbstractField
 		if (!$propertyReflection->getDeclaringClass()->hasMethod('get' . $camelCase)) throw new FormException("Unable to find getter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
 		if (!$propertyReflection->getDeclaringClass()->hasMethod('set' . $camelCase)) throw new FormException("Unable to find setter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
 
-		return (new $type(uniqid($property . '_'), $propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity), $propertyReflection))
+		return (new $type(uniqid($property . '_'), $propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity), $propertyReflection, $entity))
 			->setName($property)
+			->setEntitySetMethod($propertyReflection->getDeclaringClass()->getMethod('set' . $camelCase))
+			->setEntityGetMethod($propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase))
 			->mergeOptions($options);
 	}
 
@@ -89,8 +96,17 @@ abstract class AbstractField
 
 	public function setValue(mixed $value): AbstractField
 	{
+		if ($this->getOption('constraint')) {
+			$this->setError($this->getOption('constraint')($value));
+		}
+
 		$this->value = $value;
 		return $this;
+	}
+
+	public function getOption(string $key): mixed
+	{
+		return $this->options[$key] ?? null;
 	}
 
 	public function getOptions(): array
@@ -152,11 +168,6 @@ abstract class AbstractField
 		return is_array($this->getOption('label')) ? $this->getOption('label')['text'] : $this->getOption('label');
 	}
 
-	public function getOption(string $key): array|string|null
-	{
-		return $this->options[$key] ?? null;
-	}
-
 	public function getAttributes(): string
 	{
 		$out = "";
@@ -180,5 +191,39 @@ abstract class AbstractField
 		$view = new View($this->getOption('view_template'));
 		return $view->render(['field' => $this]);
 	}
+
+	public function getEntityGetMethod(): \ReflectionMethod
+	{
+		return $this->entityGetMethod;
+	}
+
+	public function setEntityGetMethod(\ReflectionMethod $entityGetMethod): AbstractField
+	{
+		$this->entityGetMethod = $entityGetMethod;
+		return $this;
+	}
+
+	public function getEntitySetMethod(): \ReflectionMethod
+	{
+		return $this->entitySetMethod;
+	}
+
+	public function setEntitySetMethod(\ReflectionMethod $entitySetMethod): AbstractField
+	{
+		$this->entitySetMethod = $entitySetMethod;
+		return $this;
+	}
+
+	public function getEntity(): object
+	{
+		return $this->entity;
+	}
+
+	public function setEntity(object $entity): AbstractField
+	{
+		$this->entity = $entity;
+		return $this;
+	}
+
 
 }
