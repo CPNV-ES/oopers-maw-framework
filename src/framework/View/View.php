@@ -43,7 +43,7 @@ class View implements ViewInterface
 			require $path;
 			$content = ob_get_clean();
 		} catch (\Throwable $e) {
-			return "Unable to render view";
+			throw new ViewException("Unable to render view `{$this->template}`.", previous: $e);
 		}
 		return $content;
 	}
