@@ -22,6 +22,27 @@ class View implements ViewInterface
 		$this->context = $context;
 	}
 
+	public function __get(string $name): mixed
+	{
+		return $this->get($name);
+	}
+
+	/**
+	 * Resolve data passed to view from controller
+	 * 
+	 * @param string $name
+	 * @return mixed
+	 */
+	private function get(string $name): mixed
+	{
+		return $this->context[$name];
+	}
+
+	public function __toString(): string
+	{
+		return $this->render();
+	}
+
 	public function render(array $context = []): string
 	{
 		$this->context = array_merge_recursive($this->context, $context);
@@ -43,23 +64,18 @@ class View implements ViewInterface
 		return $content;
 	}
 
-	private function get(string $name): mixed
-	{
-		return $this->context[$name];
-	}
-
+	/**
+	 * Used to generate url from views.
+	 * Method is private because de scope of view file keep scope of render method
+	 *
+	 * @param string $name
+	 * @param array $parameters
+	 * @return string
+	 * @throws \MVC\Http\Routing\Exception\MissingRouteParamsException
+	 * @throws \MVC\Http\Routing\Exception\NotFoundRouteException
+	 */
 	private function url(string $name, array $parameters = []): string
 	{
 		return Kernel::url($name, $parameters);
-	}
-
-	public function __get(string $name): mixed
-	{
-		return $this->get($name);
-	}
-
-	public function __toString(): string
-	{
-		return $this->render();
 	}
 }
