@@ -10,7 +10,7 @@ use MVC\Kernel;
 class View implements ViewInterface
 {
 
-	protected ?string $views_path = '%kernel.project_dir%/views/';
+	public ?string $views_path = '%kernel.project_dir%/views/';
 
 	protected string $template;
 
