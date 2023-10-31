@@ -43,6 +43,11 @@ class View implements ViewInterface
 		return $content;
 	}
 
+	private function get(string $name): mixed
+	{
+		return $this->context[$name];
+	}
+
 	private function url(string $name, array $parameters = []): string
 	{
 		return Kernel::url($name, $parameters);
