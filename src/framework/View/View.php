@@ -14,22 +14,17 @@ class View implements ViewInterface
 
 	private string $template;
 
-	private ?ContextInterface $context;
+	private array $context;
 
-	public function __construct(string $template, ?ContextInterface $context = null)
+	public function __construct(string $template, array $context = [])
 	{
 		$this->template = $template;
 		$this->context = $context;
 	}
 
-	public function render(Context|array $context = []): string
+	public function render(array $context = []): string
 	{
-		if (is_array($context) && is_null($this->context)) {
-			$context = (new Context())->setVars($context);
-		} elseif(is_array($context) && !is_null($this->context)) {
-			$context = $this->context->mergeVars($context);
-		}
-
+		$this->context = array_merge_recursive($this->context, $context);
 		$path = $this->views_path;
 
 		$path = str_replace(['.'], ['/'], Kernel::kernelVarsToString($path . $this->template));
@@ -51,11 +46,5 @@ class View implements ViewInterface
 	public function __toString(): string
 	{
 		return $this->render();
-	}
-
-	public function setContext(ContextInterface $context): ViewInterface
-	{
-		$this->context = $context;
-		return $this;
 	}
 }
