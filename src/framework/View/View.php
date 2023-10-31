@@ -53,6 +53,11 @@ class View implements ViewInterface
 		return Kernel::url($name, $parameters);
 	}
 
+	public function __get(string $name): mixed
+	{
+		return $this->get($name);
+	}
+
 	public function __toString(): string
 	{
 		return $this->render();
