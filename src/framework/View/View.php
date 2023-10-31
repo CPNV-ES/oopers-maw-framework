@@ -22,6 +22,12 @@ class View implements ViewInterface
 		$this->context = $context;
 	}
 
+	public function add(string $key, mixed $value): self
+	{
+		$this->context[$key] = $value;
+		return $this;
+	}
+
 	public function __get(string $name): mixed
 	{
 		return $this->get($name);
@@ -29,7 +35,7 @@ class View implements ViewInterface
 
 	/**
 	 * Resolve data passed to view from controller
-	 * 
+	 *
 	 * @param string $name
 	 * @return mixed
 	 */
