@@ -189,9 +189,8 @@ abstract class AbstractField
 
 	public function render(): string
 	{
-		$view = new View($this->getOption('view_template'));
-		$view->views_path = '%kernel.project_dir%/templates/';
-		return $view->render(['field' => $this]);
+		$view = new View($this->getOption('view_template'), ['field' => $this]);
+		return $view->render();
 	}
 
 	public function getEntityGetMethod(): \ReflectionMethod
