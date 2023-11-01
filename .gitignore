@@ -9,3 +9,4 @@
 /views/
 /.phpdoc/
 /doc/internal/
+*.cache
