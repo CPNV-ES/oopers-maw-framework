@@ -6,7 +6,8 @@
         "psr-4": {
             "MVC\\": "src/framework/",
             "ORM\\": "src/orm/",
-            "App\\": "app/"
+            "App\\": "app/",
+            "Tests\\": "tests"
         }
     },
     "require": {
