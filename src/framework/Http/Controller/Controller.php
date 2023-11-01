@@ -5,9 +5,9 @@ namespace MVC\Http\Controller;
 use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Http\Response\Response;
+use MVC\Http\Routing\Exception\MissingRouteParamsException;
+use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Kernel;
-use MVC\View\Context;
-use MVC\View\ContextInterface;
 use MVC\View\View;
 
 /**
@@ -19,14 +19,10 @@ abstract class Controller
 	protected ?string $layout = 'base';
 	protected ?string $viewPath = '%kernel.project_dir%/views/';
 
-	protected ContextInterface $context;
-
 	public function __construct(
 		protected Request $request,
 	)
 	{
-		$this->context = new Context();
-		$this->context->request = $this->request;
 	}
 
 	protected function getPathOfView(string $name): string
@@ -34,6 +30,32 @@ abstract class Controller
 		return Kernel::kernelVarsToString(($this->viewPath . str_replace(['.'], ['/'], $name) . '.php'));
 	}
 
+    /**
+     * Generate a redirection response to a internal route
+    * @param string $routeName The internal name of the route
+    * @param array|null $routeParams A array of parameters used in the route
+    * @param bool $permanent Is the redirection permanent ? (301 status if yes, 302 if not)
+    * @return Response The empty body response with a Location header
+    * @throws MissingRouteParamsException
+    * @throws NotFoundRouteException
+     */
+    protected function redirectToRoute(string $routeName, ?array $routeParams = null,bool $permanent = false): Response
+    {
+        return $this->redirect(Kernel::url($routeName,$routeParams),$permanent);
+    }
+
+    /**
+     * Generate a redirection response
+    * @param string $urlToRedirect The desired url to redirect
+    * @param bool $permanent Is the redirection permanent ? (301 status if yes, 302 if not)
+    * @return Response The empty body response with a Location header
+     */
+    protected function redirect(string $urlToRedirect,bool $permanent = false): Response
+    {
+        $response = new Response(status: $permanent ? HTTPStatus::HTTP_MOVED_PERMANENTLY : HTTPStatus::HTTP_FOUND);
+        $response->headers->set('Location', $urlToRedirect);
+        return $response;
+    }
 
 	/**
 	 * Render a view and return a Response with rendered view as content
@@ -53,7 +75,7 @@ abstract class Controller
 	 * @param array $content
 	 * @return string
 	 */
-	public function renderView(string $view, ContextInterface|array $content = []): string
+	public function renderView(string $view, array $content = []): string
 	{
 		$content = (new View($view))->render($content);
 		if ($this->layout) {
