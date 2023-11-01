@@ -8,8 +8,8 @@ use MVC\Http\Response\Response;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Kernel;
+use MVC\View\View;
 
-// TODO: Refine render component
 /**
  * Base controller that add general features like render the view
  */
@@ -77,18 +77,11 @@ abstract class Controller
 	 */
 	public function renderView(string $view, array $content = []): string
 	{
-		extract($content);
-		ob_start();
-		require(self::getPathOfView($view));
-		$content = ob_get_clean();
-		if($this->layout) {
-			ob_start();
-			require(Kernel::kernelVarsToString($this->viewPath . "templates/" . $this->layout . '.php'));
-			return ob_get_clean();
+		$content = (new View($view))->render($content);
+		if ($this->layout) {
+			$content = (new View($this->layout))->render(['body' => $content]);
 		}
-		else {
-			return $content;
-		}
+		return $content;
 	}
 
 }
