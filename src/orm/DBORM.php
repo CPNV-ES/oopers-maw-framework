@@ -1,19 +1,27 @@
 <?php
 
-namespace App\Models;
+namespace ORM;
 
 use Exception;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
 
+/**
+ * A DBORM is a repository that map PDO array to php objects with Column and Table attributes
+ */
 readonly class DBORM
 {
+    /**
+     * Create a new ORM with a given PDO database connection
+     * @param PDO $connection
+     */
     public function __construct(private PDO $connection)
     {
     }
 
     /**
+     * Fetch array of objects that match the given class type
      * @throws ReflectionException
      * @throws Exception
      */
@@ -25,26 +33,81 @@ readonly class DBORM
         $statement = $this->connection->prepare($query);
         $statement->execute();
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return array_map(fn($instanceArrayResult) => $this->mapResultToClass($classType, $instanceArrayResult), $result);
+        return array_map(fn($instanceArrayResult) => $this->mapResultToClass($classType, $instanceArrayResult),
+            $result);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getTableName($reflectionClass): string
+    {
+        $attributes = $reflectionClass->getAttributes(Table::class);
+        if (count($attributes) == 0) {
+            throw new Exception("The class $reflectionClass is not a table");
+        }
+        $table = $attributes[0]->newInstance();
+        return $table->getTableName();
     }
 
     /**
      * @throws ReflectionException
      * @throws Exception
      */
-    public function fetchOne($classType, $id)
+    private function mapResultToClass($classType, $instanceArrayResult)
+    {
+        $reflectionClass = new ReflectionClass($classType);
+        $classInstance = new $classType();
+        $reflectionProperties = $reflectionClass->getProperties();
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            if (count($columnAttribute) > 0) {
+                $column = $columnAttribute[0]->newInstance();
+                $columnName = $column->getColumnName();
+                $classInstance->{$reflectionProperty->getName()} = $this->getObjectValueFromSQL(
+                    $instanceArrayResult[$columnName],
+                    $reflectionProperty
+                );
+            }
+        }
+        return $classInstance;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
+        if (!$reflectionProperty->getType()->isBuiltin()) {
+            $foreignClass = $reflectionProperty->getType()->getName();
+            return $this->fetchOne($foreignClass, $sqlValue);
+        } else {
+            return $sqlValue;
+        }
+    }
+
+    /**
+     * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    public function fetchOne($classType, $sqlValue, $sqlColumnName = 'id')
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableName($reflectionClass);
-        $query = "SELECT * FROM $tableName WHERE id = :id";
+        $query = "SELECT * FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
-        $statement->bindParam(":id", $id);
+        $statement->bindParam(":sqlColumnName", $sqlColumnName);
+        $statement->bindParam(":sqlValue", $sqlValue);
         $statement->execute();
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
         return $this->mapResultToClass($classType, $instanceArrayResult);
     }
 
     /**
+     * Insert the given instance (without an id) in the database and return the id.
+     * Note : The instance has to have the Table attribute.
      * @throws ReflectionException
      * @throws Exception
      */
@@ -59,10 +122,15 @@ readonly class DBORM
 
         $statement = $this->connection->prepare($query);
         foreach ($reflectionProperties as $reflectionProperty) {
-            if ($reflectionProperty->getName() == "id") continue;
+            if ($reflectionProperty->getName() == "id") {
+                continue;
+            }
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             if (count($columnAttribute) > 0) {
-                $SQLValueFromObject = $this->getSQLValueFromObject($instance->{$reflectionProperty->getName()}, $reflectionProperty);
+                $SQLValueFromObject = $this->getSQLValueFromObject(
+                    $instance->{$reflectionProperty->getName()},
+                    $reflectionProperty
+                );
                 $statement->bindParam(":{$reflectionProperty->getName()}", $SQLValueFromObject);
             }
         }
@@ -75,7 +143,48 @@ readonly class DBORM
         return $idResult["id"];
     }
 
+    private function getInsertQuery($tableName, $reflectionProperties): string
+    {
+        $query = "INSERT INTO $tableName (";
+
+        $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
+            return $reflectionProperty->getName() !== "id" && count(
+                    $reflectionProperty->getAttributes(Column::class)
+                ) > 0;
+        });
+
+        $columnNames = array_map(function ($reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            $column = $columnAttribute[0]->newInstance();
+            return $column->getColumnName();
+        }, $filteredProperties);
+
+        $query .= implode(', ', $columnNames);
+        $query .= ") VALUES (";
+
+        $parameterPlaceholders = array_map(function ($columnName) {
+            return ":$columnName";
+        }, $columnNames);
+
+        $query .= implode(', ', $parameterPlaceholders);
+        $query .= ")";
+
+        return $query;
+    }
+
+    private function getSQLValueFromObject($objectValue, $reflectionProperty)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
+        if (!$reflectionProperty->getType()->isBuiltin()) {
+            return $objectValue->id;
+        } else {
+            return $objectValue;
+        }
+    }
+
     /**
+     * Update the given instance (with an id) in the database.
+     * Note : The instance has to have the Table attribute.
      * @throws ReflectionException
      * @throws Exception
      */
@@ -101,7 +210,10 @@ readonly class DBORM
         foreach ($reflectionProperties as $reflectionProperty) {
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             if (count($columnAttribute) > 0) {
-                $SQLValueFromObject = $this->getSQLValueFromObject($instance->{$reflectionProperty->getName()}, $reflectionProperty);
+                $SQLValueFromObject = $this->getSQLValueFromObject(
+                    $instance->{$reflectionProperty->getName()},
+                    $reflectionProperty
+                );
                 $statement->bindParam(":{$reflectionProperty->getName()}", $SQLValueFromObject);
             }
         }
@@ -109,98 +221,18 @@ readonly class DBORM
     }
 
     /**
+     * Delete a given classType (that have a Table attribute) where the given $sqlColumnName have a $sqlValue
      * @throws ReflectionException
      * @throws Exception
      */
-    public function delete($classType, $id): void
+    public function delete($classType, $sqlValue, $sqlColumnName = 'id'): void
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableName($reflectionClass);
-        $query = "DELETE FROM $tableName WHERE id = :id";
+        $query = "DELETE FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
-        $statement->bindParam(":id", $id);
+        $statement->bindParam(":sqlColumnName", $sqlColumnName);
+        $statement->bindParam(":sqlValue", $sqlValue);
         $statement->execute();
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function getTableName($reflectionClass): string
-    {
-        $attributes = $reflectionClass->getAttributes(Table::class);
-        if (count($attributes) == 0)
-            throw new Exception("The class $reflectionClass is not a table");
-        $table = $attributes[0]->newInstance();
-        return $table->getTableName();
-    }
-    private function getInsertQuery($tableName, $reflectionProperties): string
-    {
-        $query = "INSERT INTO $tableName (";
-
-        $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
-            return $reflectionProperty->getName() !== "id" && count($reflectionProperty->getAttributes(Column::class)) > 0;
-        });
-
-        $columnNames = array_map(function ($reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            $column = $columnAttribute[0]->newInstance();
-            return $column->getColumnName();
-        }, $filteredProperties);
-
-        $query .= implode(', ', $columnNames);
-        $query .= ") VALUES (";
-
-        $parameterPlaceholders = array_map(function ($reflectionProperty) {
-            return ":{$reflectionProperty->getName()}";
-        }, $filteredProperties);
-
-        $query .= implode(', ', $parameterPlaceholders);
-        $query .= ")";
-
-        return $query;
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws Exception
-     */
-    private function mapResultToClass($classType, $instanceArrayResult)
-    {
-        $reflectionClass = new ReflectionClass($classType);
-        $classInstance = new $classType();
-        $reflectionProperties = $reflectionClass->getProperties();
-        foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) > 0) {
-                $column = $columnAttribute[0]->newInstance();
-                $columnName = $column->getColumnName();
-                $classInstance->{$reflectionProperty->getName()} = $this->getObjectValueFromSQL($instanceArrayResult[$columnName], $reflectionProperty);
-            }
-        }
-        return $classInstance;
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
-    {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
-        if (!$reflectionProperty->getType()->isBuiltin()) {
-            $foreignClass = $reflectionProperty->getType()->getName();
-            return $this->fetchOne($foreignClass, $sqlValue);
-        } else {
-            return $sqlValue;
-        }
-    }
-
-    private function getSQLValueFromObject($objectValue, $reflectionProperty)
-    {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
-        if (!$reflectionProperty->getType()->isBuiltin()) {
-            return $objectValue->id;
-        } else {
-            return $objectValue;
-        }
     }
 }

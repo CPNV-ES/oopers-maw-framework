@@ -13,7 +13,8 @@
         "php": "^8.2",
         "doctrine/collections": "^2.1",
         "symfony/dotenv": "^6.3",
-        "symfony/var-dumper": "^6.3"
+        "symfony/var-dumper": "^6.3",
+        "ext-pdo": "*"
     },
     "authors": [
         {
