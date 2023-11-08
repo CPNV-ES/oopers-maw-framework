@@ -48,9 +48,7 @@ new \MVC\Kernel("../.env");
     - Controller \
       _All controllers from the App will be put here._
 - **views/** \
-  _All views will be put here. (Or in a sub folder)_
-  - templates/ \
-    _All layouts will be put here. (Or in a sub folder)_
+  _All views and layout will be put here. (Or in a sub folder)_
 
 ## Controllers
 All the Classes that **inherit** from MVC\Http\Controller\Controller **inside the src/Controller folder** (namespace App/Controller) will be taken in consideration when building routes.
