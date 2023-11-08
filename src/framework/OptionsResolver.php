@@ -11,19 +11,19 @@ class OptionsResolver
 	 * The default options
 	 * @var array
 	 */
-	private array $defaults = [];
+	protected array $defaults = [];
 
 	/**
 	 * The required options
 	 * @var array
 	 */
-	private array $required = [];
+	protected array $required = [];
 
 	/**
 	 * The allowed keys options
 	 * @var array
 	 */
-	private array $allowed = [];
+	protected array $allowed = [];
 
 
 	/**
