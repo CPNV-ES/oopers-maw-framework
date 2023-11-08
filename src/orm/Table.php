@@ -18,7 +18,7 @@ readonly class Table
      * Get the sql table name
      * @return string|null
      */
-    public function getTableName(): ?string
+    public function getName(): ?string
     {
         return $this->tableName;
     }
