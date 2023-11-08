@@ -63,8 +63,7 @@ readonly class DBORM
      */
     public function create($instance): int
     {
-        $classType = get_class($instance);
-        $reflectionClass = new ReflectionClass($classType);
+        $reflectionClass = new ReflectionClass($instance);
         $reflectionProperties = $reflectionClass->getProperties();
         $tableName = $this->getTableName($reflectionClass);
 
