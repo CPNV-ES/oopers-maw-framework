@@ -4,6 +4,7 @@ namespace MVC;
 
 use MVC\Filesystem\ClassFinder;
 use MVC\Http\Exception\HttpException;
+use MVC\Http\Exception\InternalServerErrorException;
 use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
@@ -30,34 +31,8 @@ class Kernel
 		if(!isset($_ENV['APP_ENV'])) $_ENV['APP_ENV'] = "PROD";
 		if(!in_array($_ENV['APP_ENV'], ['PROD', 'DEV'])) $_ENV['APP_ENV'] = "PROD";
 
-		try {
-			$this
-				->init()
-				->loadControllers()
-				->registerRoutes()
-				->registerErrors()
-				->listen()
-			;
-        }
-		catch (HttpException $exception) {
-			$exception->getResponse()->execute();
-		}
-        catch (\Throwable $error) {
-			if($_ENV['APP_ENV'] === 'DEV') dd($error);
-        	(new Http\Exception\InternalServerErrorException)->getResponse()->execute();
-        }
-    }
-
-	private function init(): self
-	{
-		$this->router = new Router();
-		return $this;
-	}
-
-    private function registerRoutes(): self
-    {
-		$this->router->compileRoutes();
-        return $this;
+        $this->router = new Router();
+        $this->loadControllers();
     }
 
 	/**
@@ -73,22 +48,24 @@ class Kernel
 		return $route->buildUrl($params);
 	}
 
-	/**
-	 * @throws \ReflectionException
-	 */
-	private function registerErrors(): self
+    /**
+     * Execute the best route found by the router
+     */
+	public function executeRoute(): void
     {
-		$this->router->compileErrorRoutes();
-		return $this;
-    }
-
-	/**
-	 * @throws \ReflectionException
-	 */
-	private function listen(): void
-    {
-        $response = $this->router->run();
-        $response->execute();
+        try {
+            $this->router->compileRoutes();
+            $this->router->compileErrorRoutes();
+            $response = $this->router->run();
+            $response->execute();
+        }
+        catch (HttpException $exception) {
+            $exception->getResponse()->execute();
+        }
+        catch (\Throwable $error) {
+            if($_ENV['APP_ENV'] === 'DEV') dd($error);
+            (new InternalServerErrorException())->getResponse()->execute();
+        }
     }
 
     public static function projectDir(): string
