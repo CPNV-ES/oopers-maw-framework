@@ -38,4 +38,13 @@ abstract class DatabaseOperations
     * @return void
      */
     abstract public function delete($classType, $rawValue, string $columnName = 'id'): void;
+
+    /**
+     * Delete a given object from the database
+    * @param $object - The object that have a Table attribute and an id property
+    * @return void
+     */
+    public function deleteObject($object){
+        $this->delete($object,$object->id);
+    }
 }
