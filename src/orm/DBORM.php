@@ -79,7 +79,7 @@ readonly class DBORM
                 $instance->{$reflectionProperty->getName()},
                 $reflectionProperty
             );
-            $statement->bindParam(":{$columnAttribute[0]->newInstance()->getColumnName()}", $SQLValueFromObject);
+            $statement->bindParam(":{$columnAttribute[0]->newInstance()->getName()}", $SQLValueFromObject);
         }
         $statement->execute();
         //If success, return the id of the instance
@@ -108,7 +108,7 @@ readonly class DBORM
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             if (count($columnAttribute) == 0) continue;
             $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getColumnName();
+            $columnName = $column->getName();
             $query .= "$columnName = :$columnName, ";
         }
         $query = substr($query, 0, -2);
@@ -168,7 +168,7 @@ readonly class DBORM
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             if (count($columnAttribute) == 0) continue;
             $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getColumnName();
+            $columnName = $column->getName();
             $classInstance->{$reflectionProperty->getName()} = $this->getObjectValueFromSQL(
                 $instanceArrayResult[$columnName],
                 $reflectionProperty
@@ -214,7 +214,7 @@ readonly class DBORM
         $columnNames = array_map(function ($reflectionProperty) {
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             $column = $columnAttribute[0]->newInstance();
-            return $column->getColumnName();
+            return $column->getName();
         }, $filteredProperties);
 
         $query .= implode(', ', $columnNames);

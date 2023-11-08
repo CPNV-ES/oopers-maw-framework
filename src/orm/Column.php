@@ -18,7 +18,7 @@ readonly class Column
      * Get the sql column name
      * @return string
      */
-    public function getColumnName(): string
+    public function getName(): string
     {
         return $this->columnName;
     }
