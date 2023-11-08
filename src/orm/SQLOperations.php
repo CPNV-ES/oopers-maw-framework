@@ -102,15 +102,16 @@ class SQLOperations extends DatabaseOperations
         $tableName = $this->getTableName($reflectionClass);
         $query = "UPDATE $tableName SET ";
         $reflectionProperties = $reflectionClass->getProperties();
+        $mappedColumns = [];
 
         foreach ($reflectionProperties as $reflectionProperty) {
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             if (count($columnAttribute) == 0) continue;
             $column = $columnAttribute[0]->newInstance();
             $columnName = $column->getName();
-            $query .= "$columnName = :$columnName, ";
+            $mappedColumns[] = "$columnName = :$columnName";
         }
-        $query = substr($query, 0, -2);
+        $query .= join(", ",$mappedColumns);
         $query .= " WHERE id = :id";
         $statement = $this->connection->prepare($query);
         foreach ($reflectionProperties as $reflectionProperty) {
