@@ -2,7 +2,6 @@
 
 namespace ORM;
 
-use Exception;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
@@ -23,7 +22,7 @@ class SQLOperations extends DatabaseOperations
     /**
      * Fetch array of objects that match the given class type
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ORMException
      */
     public function fetchAll($classType): array
     {
@@ -40,7 +39,7 @@ class SQLOperations extends DatabaseOperations
     /**
      * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ORMException
      */
     public function fetchOne($classType, $rawValue, string $columnName = 'id'): mixed
     {
@@ -59,7 +58,7 @@ class SQLOperations extends DatabaseOperations
      * Insert the given instance (without an id) in the database and return the id.
      * Note : The instance has to have the Table attribute.
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ORMException
      */
     public function create($instance): int
     {
@@ -93,7 +92,7 @@ class SQLOperations extends DatabaseOperations
      * Update the given instance (with an id) in the database.
      * Note : The instance has to have the Table attribute.
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ORMException
      */
     public function update($instance): void
     {
@@ -129,7 +128,7 @@ class SQLOperations extends DatabaseOperations
     /**
      * Delete a given classType (that have a Table attribute) where the given $sqlColumnName have a $sqlValue
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ORMException
      */
     public function delete($classType, $rawValue, string $columnName = 'id'): void
     {
@@ -143,13 +142,13 @@ class SQLOperations extends DatabaseOperations
     }
 
     /**
-     * @throws Exception
+     * @throws ORMException
      */
     private function getTableName($reflectionClass): string
     {
         $attributes = $reflectionClass->getAttributes(Table::class);
         if (count($attributes) == 0) {
-            throw new Exception("The class $reflectionClass is not a table");
+            throw new ORMException("The class $reflectionClass is not a table");
         }
         $table = $attributes[0]->newInstance();
         return $table->getTableName();
@@ -157,7 +156,7 @@ class SQLOperations extends DatabaseOperations
 
     /**
      * @throws ReflectionException
-     * @throws Exception
+     * @throws ORMException
      */
     private function mapResultToClass($classType, $instanceArrayResult)
     {
