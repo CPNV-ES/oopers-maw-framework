@@ -87,4 +87,26 @@ class OptionsResolver
 		return join("', '", $this->getRequiredGivenDiff());
 	}
 
+	public function getRequired(): array
+	{
+		return $this->required;
+	}
+
+	public function setRequired(array $required): OptionsResolver
+	{
+		$this->required = $required;
+		return $this;
+	}
+
+	public function getAllowed(): array
+	{
+		return $this->allowed;
+	}
+
+	public function setAllowed(array $allowed): OptionsResolver
+	{
+		$this->allowed = $allowed;
+		return $this;
+	}
+
 }
