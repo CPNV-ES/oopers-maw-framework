@@ -1,4 +1,4 @@
-# DBORM component
+# Database Operations Component
 
 ___
 <!-- TOC -->
@@ -38,7 +38,7 @@ class User
 ### CRUD Actions with your entity
 In a model, you can use the DBORM with a PDO connected to your database to make CRUD actions.
 ```php
-$orm = new DBORM($pdoConnection);
+$orm = new SQLOperations($pdoConnection);
 //Fetch
 $allUsers = $orm->fetchAll(User::class);
 $userById = $orm->fetchOne(User::class,1);

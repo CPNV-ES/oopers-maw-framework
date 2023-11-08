@@ -10,13 +10,13 @@ use ReflectionException;
 /**
  * A DBORM is a repository that map PDO array to php objects with Column and Table attributes
  */
-readonly class DBORM
+class SQLOperations extends DatabaseOperations
 {
     /**
      * Create a new ORM with a given PDO database connection
      * @param PDO $connection
      */
-    public function __construct(private PDO $connection)
+    public function __construct(private readonly PDO $connection)
     {
     }
 
@@ -42,14 +42,14 @@ readonly class DBORM
      * @throws ReflectionException
      * @throws Exception
      */
-    public function fetchOne($classType, $sqlValue, $sqlColumnName = 'id')
+    public function fetchOne($classType, $rawValue, string $columnName = 'id'): mixed
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableName($reflectionClass);
         $query = "SELECT * FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
-        $statement->bindParam(":sqlColumnName", $sqlColumnName);
-        $statement->bindParam(":sqlValue", $sqlValue);
+        $statement->bindParam(":sqlColumnName", $columnName);
+        $statement->bindParam(":sqlValue", $rawValue);
         $statement->execute();
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
         return $this->mapResultToClass($classType, $instanceArrayResult);
@@ -130,14 +130,14 @@ readonly class DBORM
      * @throws ReflectionException
      * @throws Exception
      */
-    public function delete($classType, $sqlValue, $sqlColumnName = 'id'): void
+    public function delete($classType, $rawValue, string $columnName = 'id'): void
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableName($reflectionClass);
         $query = "DELETE FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
-        $statement->bindParam(":sqlColumnName", $sqlColumnName);
-        $statement->bindParam(":sqlValue", $sqlValue);
+        $statement->bindParam(":sqlColumnName", $columnName);
+        $statement->bindParam(":sqlValue", $rawValue);
         $statement->execute();
     }
 
