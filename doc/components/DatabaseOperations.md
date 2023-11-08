@@ -41,7 +41,7 @@ In a model, you can use the DBORM with a PDO connected to your database to make 
 $orm = new SQLOperations($pdoConnection);
 //Fetch
 $allUsers = $orm->fetchAll(User::class);
-$userById = $orm->fetchOne(User::class,1);
+$userById = $orm->fetchOne(User::class, 1);
 
 //Create
 $newUser = new User("Mike");
