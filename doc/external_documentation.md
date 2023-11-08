@@ -36,9 +36,11 @@ You can now create an index.php with the following content :
 ```php
 <?php
 
+use MVC\Kernel;
+
 require '../vendor/autoload.php';
 //Launch the MVC framework via its kernel and execute the route
-new \MVC\Kernel("../.env")->executeRoute();
+(new Kernel("../.env"))->executeRoute();
 //The parameter is the dotenv file path. You will need a .env in the parent folder in this situation.
 ```
 
