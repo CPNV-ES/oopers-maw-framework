@@ -7,7 +7,7 @@ use ReflectionClass;
 use ReflectionException;
 
 /**
- * A DBORM is a repository that map PDO array to php objects with Column and Table attributes
+ * A SQLOperations is a repository that map PDO array to php objects with Column and Table attributes
  */
 class SQLOperations extends DatabaseOperations
 {
