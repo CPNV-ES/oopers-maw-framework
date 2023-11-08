@@ -19,12 +19,13 @@ use Symfony\Component\Dotenv\Dotenv;
 // TODO: Implement customized HTTP Error
 class Kernel
 {
-	use Singleton;
+    protected static $_instance;
 
 	private Router $router;
 
     public function __construct(string $envPath)
     {
+        Kernel::$_instance = $this;
 		$dotenv = new Dotenv();
 		$dotenv->load($envPath);
 
@@ -33,6 +34,11 @@ class Kernel
 
         $this->router = new Router();
         $this->loadControllers();
+    }
+
+    public static function getInstance()
+    {
+        return self::$_instance;
     }
 
 	/**
