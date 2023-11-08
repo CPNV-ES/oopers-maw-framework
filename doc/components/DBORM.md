@@ -38,7 +38,7 @@ class User
 ### CRUD Actions with your entity
 In a model, you can use the DBORM with a PDO connected to your database to make CRUD actions.
 ```php
-$orm = new DBORM($pdoConnexion);
+$orm = new DBORM($pdoConnection);
 //Fetch
 $allUsers = $orm->fetchAll(User::class);
 $userById = $orm->fetchOne(User::class,1);
