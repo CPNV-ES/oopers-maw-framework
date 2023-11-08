@@ -178,6 +178,7 @@ class SQLOperations extends DatabaseOperations
 
     /**
      * @throws ReflectionException
+     * @throws ORMException
      */
     private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
     {
