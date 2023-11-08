@@ -25,11 +25,13 @@ class User
 {
     //...
     #[Column("id")]
-    public int id;
+    public int $id;
+
     #[Column("first_name")]
-    public string firstName;
+    public int $first;
+    
     #[Column("date_of_birth")]
-    public DateTime dateOfBirth;
+    public DateTime $dateOfBirth;
 }
 ```
 
