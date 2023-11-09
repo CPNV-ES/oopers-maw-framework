@@ -29,7 +29,7 @@ class OptionsResolver
 	/**
 	 * @throws Exception
 	 */
-	public function setDefaults(array $defaults): self
+	public function setDefaults(array $defaults = []): self
 	{
 		array_map(fn($value) => $this->isAllowed($value), array_keys($defaults));
 		$this->defaults = $defaults;
