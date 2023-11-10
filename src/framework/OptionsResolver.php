@@ -57,7 +57,7 @@ class OptionsResolver
 	public function set(string $key, mixed $value): self
 	{
 		$this->isAllowed($key);
-		$this->defaults[$key] = is_array($value) ? array_key_exists($key, $this->defaults) ? array_merge($this->defaults[$key], $value) : $value : $value;
+		$this->defaults[$key] = is_array($value) ? array_key_exists($key, $this->defaults) ? array_merge_recursive($this->defaults[$key], $value) : $value : $value;
 		return $this;
 	}
 
