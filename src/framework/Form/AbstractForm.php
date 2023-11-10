@@ -5,6 +5,7 @@ namespace MVC\Form;
 use MVC\Form\Field\AbstractField;
 use MVC\Http\HTTPMethod;
 use MVC\Http\Request;
+use MVC\OptionsResolver;
 
 abstract class AbstractForm
 {
@@ -14,37 +15,19 @@ abstract class AbstractForm
 	private string $entity_name;
 	private object $entity;
 
-	/**
-	 * @var array{
-	 *     view_template: string,
-	 *     action_route: ?string,
-	 * }
-	 */
-	private array $options = [];
+	private OptionsResolver $options;
 	private ?Request $request = null;
-	private array $default_options = [
-		'view_template' => 'required',
-		'action_route' => 'optional',
-	];
 
 	public function __construct(object $entity)
 	{
 		$this->entity = $entity;
 		$this->setEntityName(get_class($entity));
-		$this->defaultOptions();
-	}
-
-	public function defaultOptions(): self
-	{
-		return $this
-			->addOption('method', 'POST')
-			->addOption('attributes', [])
-			->addOption('action_route', '');
+		$this->options = FormOptionResolverFactory::create();
 	}
 
 	public function addOption(string $key, mixed $value): self
 	{
-		$this->options[$key] = $value;
+		$this->options->set($key, $value);
 		return $this;
 	}
 
@@ -106,11 +89,6 @@ abstract class AbstractForm
 		return FormView::createFromForm($this);
 	}
 
-	public function getEntityName(): string
-	{
-		return $this->entity_name;
-	}
-
 	public function setEntityName(string $entity_name): AbstractForm
 	{
 		$this->entity_name = $entity_name;
@@ -119,18 +97,7 @@ abstract class AbstractForm
 
 	public function getOptions(): array
 	{
-		return $this->options;
-	}
-
-	public function setOptions(array $options): AbstractForm
-	{
-		$this->options = $options;
-		return $this;
-	}
-
-	public function getDefaultOptions(): array
-	{
-		return $this->default_options;
+		return $this->options->resolve();
 	}
 
 	public function isValid(): bool
@@ -144,12 +111,6 @@ abstract class AbstractForm
 	public function getFields(): array
 	{
 		return $this->fields;
-	}
-
-	public function setFields(array $fields): AbstractForm
-	{
-		$this->fields = $fields;
-		return $this;
 	}
 
 	public function getAttributes(): string
@@ -167,7 +128,7 @@ abstract class AbstractForm
 
 	public function getOption(string $key): mixed
 	{
-		return $this->options[$key] ?? null;
+		return $this->options->resolve()[$key];
 	}
 
 	protected function add(string $property, string $type, array $options = []): AbstractForm
@@ -180,12 +141,6 @@ abstract class AbstractForm
 	public function getEntity(): object
 	{
 		return $this->entity;
-	}
-
-	public function setEntity(object $entity): AbstractForm
-	{
-		$this->entity = $entity;
-		return $this;
 	}
 
 }
