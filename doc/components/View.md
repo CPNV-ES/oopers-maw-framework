@@ -85,6 +85,16 @@ Next in your view file you can also insert past comment. And simply create your 
 </table>
 ```
 
+You can include other view in your template with the 'include' method : 
+```php
+// views/user/index.php
+<?php /** @var \MVC\View $this */ ?>
+...
+$this->include("partial.navbar");
+//OR with parameters
+$this->include("partial.navbar",["title"=>"Users"]);
+```
+
 You can also use View object to create components by create a file that extends from `View`. Like this :
 
 ```php

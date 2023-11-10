@@ -70,6 +70,19 @@ class View implements ViewInterface
 		return $content;
 	}
 
+    /**
+     * Include and render another view inside the actual template that is rendering
+     * Method is private because de scope of view file keep scope of render method
+    * @param string $template
+    * @param array $context
+    * @return string - The generated content
+    * @throws ViewException
+     */
+    private function include(string $template, array $context = []): string
+    {
+        return (new View($template))->render($context);
+    }
+
 	/**
 	 * Used to generate url from views.
 	 * Method is private because de scope of view file keep scope of render method
