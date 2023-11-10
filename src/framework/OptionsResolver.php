@@ -32,7 +32,11 @@ class OptionsResolver
 	public function setDefaults(array $defaults = []): self
 	{
 		array_map(fn($value) => $this->isAllowed($value), array_keys($defaults));
-		$this->defaults = $defaults;
+		if (!empty($this->defaults)) {
+			$this->defaults = array_merge_recursive($this->defaults, $defaults);
+		} else {
+			$this->defaults = $defaults;
+		}
 		return $this;
 	}
 
@@ -87,25 +91,23 @@ class OptionsResolver
 		return join("', '", $this->getRequiredGivenDiff());
 	}
 
-	public function getRequired(): array
-	{
-		return $this->required;
-	}
-
 	public function setRequired(array $required): OptionsResolver
 	{
-		$this->required = $required;
+		if (!empty($this->required)) {
+			$this->required = array_merge_recursive($this->required, $required);
+		} else {
+			$this->required = $required;
+		}
 		return $this;
-	}
-
-	public function getAllowed(): array
-	{
-		return $this->allowed;
 	}
 
 	public function setAllowed(array $allowed): OptionsResolver
 	{
-		$this->allowed = $allowed;
+		if (!empty($this->allowed)) {
+			$this->allowed = array_merge_recursive($this->allowed, $allowed);
+		} else {
+			$this->allowed = $allowed;
+		}
 		return $this;
 	}
 
