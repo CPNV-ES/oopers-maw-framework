@@ -73,10 +73,10 @@ class View implements ViewInterface
     /**
      * Include and render another view inside the actual template that is rendering
      * Method is private because de scope of view file keep scope of render method
-    * @param string $template
-    * @param array $context
-    * @return string - The generated content
-    * @throws ViewException
+     * @param string $template
+     * @param array $context
+     * @return string - The generated content
+     * @throws ViewException
      */
     private function include(string $template, array $context = []): string
     {
