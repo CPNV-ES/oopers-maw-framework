@@ -17,6 +17,13 @@ class FormOptionResolverFactory
 				'attributes',
 				'method',
 			])
+			->setRequired([
+				'method',
+			])
+			->setDefaults([
+				'method' => 'POST',
+				'attributes' => []
+			])
 		;
 		
 	}
