@@ -128,7 +128,7 @@ abstract class AbstractForm
 
 	public function getOption(string $key): mixed
 	{
-		return $this->options->resolve()[$key];
+		return $this->options->resolve()[$key] ?? null;
 	}
 
 	protected function add(string $property, string $type, array $options = []): AbstractForm
