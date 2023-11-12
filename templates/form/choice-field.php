@@ -1,12 +1,9 @@
 <?php
 
 use MVC\Form\Field\ChoiceField;
-use MVC\View\ContextInterface;
-
-/** @var ContextInterface $context */
 
 /** @var ChoiceField $field */
-$field = $context->field;
+$field = $this->field;
 
 ?>
 <div class="form-control">
