@@ -100,8 +100,8 @@ abstract class AbstractField
 		if ($this->getOption('constraint')) {
 			$this->setError($this->getOption('constraint')($value));
 		}
-
 		$this->value = $value;
+		$this->updateEntity();
 		return $this;
 	}
 
