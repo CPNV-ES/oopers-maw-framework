@@ -32,11 +32,11 @@ abstract class AbstractField
 
 	private array $error = [];
 
-	private \ReflectionProperty $property;
+	protected \ReflectionProperty $property;
 
-	private \ReflectionMethod $entityGetMethod;
-	private \ReflectionMethod $entitySetMethod;
-	private object $entity;
+	protected \ReflectionMethod $entityGetMethod;
+	protected \ReflectionMethod $entitySetMethod;
+	protected object $entity;
 	private bool $changes = false;
 
 	public function __construct(string $id, mixed $value, \ReflectionProperty $property, object $entity)
@@ -59,7 +59,8 @@ abstract class AbstractField
 			->setName($property)
 			->setEntitySetMethod($propertyReflection->getDeclaringClass()->getMethod('set' . $camelCase))
 			->setEntityGetMethod($propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase))
-			->mergeOptions($options);
+			->mergeOptions($options)
+			->build();
 	}
 
 	public function getName(): string
@@ -110,6 +111,65 @@ abstract class AbstractField
 		return $this->options[$key] ?? null;
 	}
 
+	private function updateEntity(): self
+	{
+		if ($this->getEntityValue() === $this->getValue() || $this->hasError()) return $this;
+		$this
+			->setEntityValue($this->getValue())
+			->changes = true;;
+		return $this;
+	}
+
+	private function getEntityValue(): self
+	{
+		$this->getEntityGetMethod()->invoke($this->getEntity());
+		return $this;
+	}
+
+	public function getEntityGetMethod(): \ReflectionMethod
+	{
+		return $this->entityGetMethod;
+	}
+
+	public function setEntityGetMethod(\ReflectionMethod $entityGetMethod): AbstractField
+	{
+		$this->entityGetMethod = $entityGetMethod;
+		return $this;
+	}
+
+	public function getEntity(): object
+	{
+		return $this->entity;
+	}
+
+	public function setEntity(object $entity): AbstractField
+	{
+		$this->entity = $entity;
+		return $this;
+	}
+
+	public function hasError(): bool
+	{
+		return !empty($this->error);
+	}
+
+	private function setEntityValue(mixed $value): self
+	{
+		$this->getEntitySetMethod()->invoke($this->getEntity(), $value);
+		return $this;
+	}
+
+	public function getEntitySetMethod(): \ReflectionMethod
+	{
+		return $this->entitySetMethod;
+	}
+
+	public function setEntitySetMethod(\ReflectionMethod $entitySetMethod): AbstractField
+	{
+		$this->entitySetMethod = $entitySetMethod;
+		return $this;
+	}
+
 	public function getOptions(): array
 	{
 		return $this->options;
@@ -125,11 +185,6 @@ abstract class AbstractField
 	{
 		$this->options[$key] = $option;
 		return $this;
-	}
-
-	public function hasError(): bool
-	{
-		return !empty($this->error);
 	}
 
 	public function getErrorMessage(): string
@@ -189,62 +244,16 @@ abstract class AbstractField
 
 	public function render(): string
 	{
-		$view = new View($this->getOption('view_template'), ['field' => $this]);
+		$view = new FieldView($this->getOption('view_template'), ['field' => $this]);
 		return $view->render();
 	}
 
-	public function getEntityGetMethod(): \ReflectionMethod
-	{
-		return $this->entityGetMethod;
-	}
-
-	public function setEntityGetMethod(\ReflectionMethod $entityGetMethod): AbstractField
-	{
-		$this->entityGetMethod = $entityGetMethod;
-		return $this;
-	}
-
-	public function getEntitySetMethod(): \ReflectionMethod
-	{
-		return $this->entitySetMethod;
-	}
-
-	public function setEntitySetMethod(\ReflectionMethod $entitySetMethod): AbstractField
-	{
-		$this->entitySetMethod = $entitySetMethod;
-		return $this;
-	}
-
-	public function getEntity(): object
-	{
-		return $this->entity;
-	}
-
-	public function setEntity(object $entity): AbstractField
-	{
-		$this->entity = $entity;
-		return $this;
-	}
-
-	private function setEntityValue(mixed $value): self
-	{
-		$this->getEntitySetMethod()->invoke($this->getEntity(), $value);
-		return $this;
-	}
-
-	private function getEntityValue(): self
-	{
-		$this->getEntityGetMethod()->invoke($this->getEntity());
-		return $this;
-	}
-
-	private function updateEntity(): self
-	{
-		if ($this->getEntityValue() === $this->getValue()) return $this;
-		$this
-			->setEntityValue($this->getValue())
-			->changes = true;
-		;
+	/**
+	 * Method called after having defined all variables about the field
+	 * Must be overwritten to add specific behavior
+	 * @return self
+	 */
+	public function build() {
 		return $this;
 	}
 

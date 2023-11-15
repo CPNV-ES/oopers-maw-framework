@@ -14,11 +14,11 @@ $field = $this->field;
 			<?php if (is_array($choice->value)): ?>
                 <optgroup label="<?= $choice->label ?>">
 					<?php foreach ($choice->value as $subChoice): ?>
-                        <option value="<?= $subChoice->id ?>" <?= $subChoice->isSelected() ? 'selected' : '' ?>><?= $subChoice->value ?></option>
+                        <option value="<?= $subChoice->value ?>" <?= $subChoice->isSelected() ? 'selected' : '' ?>><?= $subChoice->label ?></option>
 					<?php endforeach; ?>
                 </optgroup>
 			<?php else: ?>
-                <option value="<?= $choice->id ?>" <?= $choice->isSelected() ? 'selected' : '' ?>><?= $choice->value ?></option>
+                <option value="<?= $choice->value ?>" <?= $choice->isSelected() ? 'selected' : '' ?>><?= $choice->label ?></option>
 			<?php endif; ?>
 		<?php endforeach; ?>
     </select>
