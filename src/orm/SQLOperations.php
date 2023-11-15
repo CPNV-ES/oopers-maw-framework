@@ -52,7 +52,7 @@ class SQLOperations extends DatabaseOperations
             }
             $column = $columnAttribute[0]->newInstance();
             $columnName = $column->getName();
-            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($this->getObjectValueFromSQL(
+            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($classInstance,$this->getObjectValueFromSQL(
                 $instanceArrayResult[$columnName],
                 $reflectionProperty
             ));
@@ -118,7 +118,7 @@ class SQLOperations extends DatabaseOperations
             }
 
             $SQLValueFromObject = $this->getSQLValueFromObject(
-                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke(),
+                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
                 $reflectionProperty
             );
             $statement->bindParam(":{$columnAttribute[0]->newInstance()->getName()}", $SQLValueFromObject);
@@ -204,7 +204,7 @@ class SQLOperations extends DatabaseOperations
                 continue;
             }
             $SQLValueFromObject = $this->getSQLValueFromObject(
-                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke(),
+                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
                 $reflectionProperty
             );
             $statement->bindParam(":{$reflectionProperty->getName()}", $SQLValueFromObject);
