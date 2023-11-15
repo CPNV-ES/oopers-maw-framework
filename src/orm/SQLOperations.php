@@ -189,7 +189,7 @@ class SQLOperations extends DatabaseOperations
      */
     private function getMethodOfProperty($reflectionClass,$reflectionProperty,$read = true){
         $propertyName = $reflectionProperty->getName();
-        $methodName = $read?'get':'set'.str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
+        $methodName = ($read?'get':'set').str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
         if(!$reflectionClass->hasMethod($methodName)) throw new ORMException("The attribute $propertyName of $reflectionClass->name has no method called $methodName");
         return $reflectionClass->getMethod($methodName);
     }
