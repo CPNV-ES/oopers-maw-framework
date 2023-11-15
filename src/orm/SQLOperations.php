@@ -86,9 +86,7 @@ class SQLOperations extends DatabaseOperations
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "SELECT * FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
-        $statement->bindParam(":sqlColumnName", $columnName);
-        $statement->bindParam(":sqlValue", $rawValue);
-        $statement->execute();
+        $statement->execute([':sqlColumnName'=>$columnName,':sqlValue'=>$rawValue]);
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
         return $this->mapResultToClass($classType, $instanceArrayResult);
     }
@@ -108,6 +106,7 @@ class SQLOperations extends DatabaseOperations
         $query = $this->getInsertQuery($tableName, $reflectionProperties);
 
         $statement = $this->connection->prepare($query);
+        $params = [];
         foreach ($reflectionProperties as $reflectionProperty) {
             if ($reflectionProperty->getName() == "id") {
                 continue;
@@ -121,9 +120,9 @@ class SQLOperations extends DatabaseOperations
                 $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
                 $reflectionProperty
             );
-            $statement->bindParam(":{$columnAttribute[0]->newInstance()->getName()}", $SQLValueFromObject);
+            $params[":{$columnAttribute[0]->newInstance()->getName()}"] = $SQLValueFromObject;
         }
-        $statement->execute();
+        $statement->execute($params);
         //If success, return the id of the instance
         $idQuery = "SELECT id FROM $tableName ORDER BY id DESC LIMIT 1";
         $idStatement = $this->connection->prepare($idQuery);
@@ -202,6 +201,7 @@ class SQLOperations extends DatabaseOperations
         $query .= join(", ", $mappedColumns);
         $query .= " WHERE id = :id";
         $statement = $this->connection->prepare($query);
+        $params = [];
         foreach ($reflectionProperties as $reflectionProperty) {
             $columnAttribute = $reflectionProperty->getAttributes(Column::class);
             if (count($columnAttribute) == 0) {
@@ -211,9 +211,9 @@ class SQLOperations extends DatabaseOperations
                 $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
                 $reflectionProperty
             );
-            $statement->bindParam(":{$reflectionProperty->getName()}", $SQLValueFromObject);
+            $params[":{$reflectionProperty->getName()}"] = $SQLValueFromObject;
         }
-        $statement->execute();
+        $statement->execute($params);
     }
 
     /**
@@ -227,8 +227,6 @@ class SQLOperations extends DatabaseOperations
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "DELETE FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
-        $statement->bindParam(":sqlColumnName", $columnName);
-        $statement->bindParam(":sqlValue", $rawValue);
-        $statement->execute();
+        $statement->execute([':sqlColumnName'=>$columnName,':sqlValue'=>$rawValue]);
     }
 }
