@@ -65,10 +65,10 @@ class SQLOperations extends DatabaseOperations
             }
             $column = $columnAttribute[0]->newInstance();
             $columnName = $column->getName();
-            $classInstance->{$reflectionProperty->getName()} = $this->getObjectValueFromSQL(
+            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($this->getObjectValueFromSQL(
                 $instanceArrayResult[$columnName],
                 $reflectionProperty
-            );
+            ));
         }
         return $classInstance;
     }
@@ -129,8 +129,9 @@ class SQLOperations extends DatabaseOperations
             if (count($columnAttribute) == 0) {
                 continue;
             }
+
             $SQLValueFromObject = $this->getSQLValueFromObject(
-                $instance->{$reflectionProperty->getName()},
+                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke(),
                 $reflectionProperty
             );
             $statement->bindParam(":{$columnAttribute[0]->newInstance()->getName()}", $SQLValueFromObject);
@@ -184,6 +185,16 @@ class SQLOperations extends DatabaseOperations
     }
 
     /**
+     * @throws ORMException
+     */
+    private function getMethodOfProperty($reflectionClass,$reflectionProperty,$read = true){
+        $propertyName = $reflectionProperty->getName();
+        $methodName = $read?'get':'set'.str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
+        if(!$reflectionClass->hasMethod($methodName)) throw new ORMException("The attribute $propertyName of $reflectionClass->name has no method called $methodName");
+        return $reflectionClass->getMethod($methodName);
+    }
+
+    /**
      * Update the given instance (with an id) in the database.
      * Note : The instance has to have the Table attribute.
      * @throws ReflectionException
@@ -216,7 +227,7 @@ class SQLOperations extends DatabaseOperations
                 continue;
             }
             $SQLValueFromObject = $this->getSQLValueFromObject(
-                $instance->{$reflectionProperty->getName()},
+                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke(),
                 $reflectionProperty
             );
             $statement->bindParam(":{$reflectionProperty->getName()}", $SQLValueFromObject);
