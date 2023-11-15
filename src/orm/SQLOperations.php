@@ -27,26 +27,13 @@ class SQLOperations extends DatabaseOperations
     public function fetchAll($classType): array
     {
         $reflectionClass = new ReflectionClass($classType);
-        $tableName = $this->getName($reflectionClass);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "SELECT * FROM $tableName";
         $statement = $this->connection->prepare($query);
         $statement->execute();
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         return array_map(fn($instanceArrayResult) => $this->mapResultToClass($classType, $instanceArrayResult),
             $result);
-    }
-
-    /**
-     * @throws ORMException
-     */
-    private function getName($reflectionClass): string
-    {
-        $attributes = $reflectionClass->getAttributes(Table::class);
-        if (count($attributes) == 0) {
-            throw new ORMException("The class $reflectionClass is not a table");
-        }
-        $table = $attributes[0]->newInstance();
-        return $table->getName();
     }
 
     /**
@@ -96,7 +83,7 @@ class SQLOperations extends DatabaseOperations
     public function fetchOne($classType, $rawValue, string $columnName = 'id'): mixed
     {
         $reflectionClass = new ReflectionClass($classType);
-        $tableName = $this->getName($reflectionClass);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "SELECT * FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
         $statement->bindParam(":sqlColumnName", $columnName);
@@ -116,7 +103,7 @@ class SQLOperations extends DatabaseOperations
     {
         $reflectionClass = new ReflectionClass($instance);
         $reflectionProperties = $reflectionClass->getProperties();
-        $tableName = $this->getName($reflectionClass);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
 
         $query = $this->getInsertQuery($tableName, $reflectionProperties);
 
@@ -185,16 +172,6 @@ class SQLOperations extends DatabaseOperations
     }
 
     /**
-     * @throws ORMException
-     */
-    private function getMethodOfProperty($reflectionClass,$reflectionProperty,$read = true){
-        $propertyName = $reflectionProperty->getName();
-        $methodName = ($read?'get':'set').str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
-        if(!$reflectionClass->hasMethod($methodName)) throw new ORMException("The attribute $propertyName of $reflectionClass->name has no method called $methodName");
-        return $reflectionClass->getMethod($methodName);
-    }
-
-    /**
      * Update the given instance (with an id) in the database.
      * Note : The instance has to have the Table attribute.
      * @throws ReflectionException
@@ -204,7 +181,7 @@ class SQLOperations extends DatabaseOperations
     {
         $classType = get_class($instance);
         $reflectionClass = new ReflectionClass($classType);
-        $tableName = $this->getName($reflectionClass);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "UPDATE $tableName SET ";
         $reflectionProperties = $reflectionClass->getProperties();
         $mappedColumns = [];
@@ -243,7 +220,7 @@ class SQLOperations extends DatabaseOperations
     public function delete($classType, $rawValue, string $columnName = 'id'): void
     {
         $reflectionClass = new ReflectionClass($classType);
-        $tableName = $this->getName($reflectionClass);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "DELETE FROM $tableName WHERE :sqlColumnName = :sqlValue";
         $statement = $this->connection->prepare($query);
         $statement->bindParam(":sqlColumnName", $columnName);

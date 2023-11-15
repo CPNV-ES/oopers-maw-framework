@@ -52,4 +52,30 @@ abstract class DatabaseOperations
      * @return void
      */
     abstract public function delete($classType, $rawValue, string $columnName = 'id'): void;
+
+    /**
+     * Get the table name of the reflected class
+     * @throws ORMException - Thrown if the class has no Table attribute
+     */
+    protected function getTableNameOfReflectedClass($reflectionClass): string
+    {
+        $attributes = $reflectionClass->getAttributes(Table::class);
+        if (count($attributes) == 0) {
+            throw new ORMException("The class $reflectionClass is not a table");
+        }
+        $table = $attributes[0]->newInstance();
+        return $table->getName();
+    }
+
+
+    /**
+     * Get the public (getter if read = true / setter if read = false) method of the given private property to access it
+     * @throws ORMException
+     */
+    protected function getMethodOfProperty($reflectionClass,$reflectionProperty,$read){
+        $propertyName = $reflectionProperty->getName();
+        $methodName = ($read?'get':'set').str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
+        if(!$reflectionClass->hasMethod($methodName)) throw new ORMException("The attribute $propertyName of $reflectionClass->name has no method called $methodName");
+        return $reflectionClass->getMethod($methodName);
+    }
 }
