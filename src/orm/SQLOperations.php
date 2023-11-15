@@ -67,8 +67,12 @@ class SQLOperations extends DatabaseOperations
     private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
     {
         //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
-        if (!$reflectionProperty->getType()->isBuiltin()) {
-            $foreignClass = $reflectionProperty->getType()->getName();
+        $type = $reflectionProperty->getType();
+        if (!$type->isBuiltin()) {
+            if(enum_exists($type)){
+                return $type->getName()::from($sqlValue);
+            }
+            $foreignClass = $type->getName();
             return $this->fetchOne($foreignClass, $sqlValue);
         } else {
             return $sqlValue;
