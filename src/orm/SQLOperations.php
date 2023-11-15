@@ -167,7 +167,7 @@ class SQLOperations extends DatabaseOperations
         $type = $reflectionProperty->getType();
         if (!$type->isBuiltin()) {
             if(enum_exists($type)){
-                return $objectValue;
+                return $objectValue->name;
             }
             return $objectValue->id;
         } else {
