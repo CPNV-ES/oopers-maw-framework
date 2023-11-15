@@ -164,7 +164,11 @@ class SQLOperations extends DatabaseOperations
     private function getSQLValueFromObject($objectValue, $reflectionProperty)
     {
         //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
-        if (!$reflectionProperty->getType()->isBuiltin()) {
+        $type = $reflectionProperty->getType();
+        if (!$type->isBuiltin()) {
+            if(enum_exists($type)){
+                return $objectValue;
+            }
             return $objectValue->id;
         } else {
             return $objectValue;
