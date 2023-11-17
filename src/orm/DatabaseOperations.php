@@ -2,6 +2,9 @@
 
 namespace ORM;
 
+/**
+* Operate with a database in an object-oriented way (with attributes)
+ */
 abstract class DatabaseOperations
 {
     /**
@@ -14,11 +17,10 @@ abstract class DatabaseOperations
     /**
      * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue
      * @param $classType - Object or class to fetch
-     * @param $rawValue - The raw value inside the database
-     * @param string $columnName - The column name to compare the raw value with
+     * @param $id - The identifier of the object to fetch
      * @return mixed - The object fetched of the given type (if any)
      */
-    abstract public function fetchOne($classType, $rawValue, string $columnName = 'id'): mixed;
+    abstract public function fetchOne($classType, $id): mixed;
 
     /**
      * Add the given object instance to the database

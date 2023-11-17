@@ -81,18 +81,18 @@ class SQLOperations extends DatabaseOperations
     }
 
     /**
-     * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue.
+     * Fetch an object of the given class type that have a given $id.
      * Can throw not found exception if the PDO fetch didn't return anything.
      * @throws ReflectionException
      * @throws ORMException|NotFoundException
      */
-    public function fetchOne($classType, $rawValue, string $columnName = 'id'): mixed
+    public function fetchOne($classType, $id): mixed
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "SELECT * FROM $tableName WHERE :sqlColumnName = :sqlValue";
+        $query = "SELECT * FROM $tableName WHERE id = :id";
         $statement = $this->connection->prepare($query);
-        $statement->execute([':sqlColumnName'=>$columnName,':sqlValue'=>$rawValue]);
+        $statement->execute([':id'=>$id]);
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
         if(!$instanceArrayResult) throw new NotFoundException();
         return $this->mapResultToClass($classType, $instanceArrayResult);
