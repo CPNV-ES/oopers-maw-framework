@@ -1,4 +1,3 @@
-
 <div class="form-control">
 	<?php if ($this->field->getOption('label')): ?><label
         for="<?= $this->field->getId() ?>"><?= $this->field->getLabel() ?></label><?php endif; ?>
