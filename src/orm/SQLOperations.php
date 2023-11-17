@@ -49,7 +49,7 @@ class SQLOperations extends DatabaseOperations
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "SELECT * FROM $tableName WHERE id = :id";
+        $query = "SELECT * FROM $tableName WHERE id = :id LIMIT 1";
         $statement = $this->connection->prepare($query);
         $statement->execute([':id'=>$id]);
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
