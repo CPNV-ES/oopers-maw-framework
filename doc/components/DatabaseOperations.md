@@ -41,7 +41,8 @@ In a model, you can use the DBORM with a PDO connected to your database to make 
 $orm = new SQLOperations($pdoConnection);
 //Fetch
 $allUsers = $orm->fetchAll(User::class);
-$userById = $orm->fetchOne(User::class, 1);
+$userById = $orm->fetchOne(User::class, ["id"=>1]); //This can throw 404 if the user is not found
+$usersWithName = $orm->fetchAll(User::class, ["name"=>"dupont","firstname"=>"jean"]);
 
 //Create
 $newUser = new User("Mike");
