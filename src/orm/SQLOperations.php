@@ -81,9 +81,10 @@ class SQLOperations extends DatabaseOperations
     }
 
     /**
-     * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue
+     * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue.
+     * Can throw not found exception if the PDO fetch didn't return anything.
      * @throws ReflectionException
-     * @throws ORMException
+     * @throws ORMException|NotFoundException
      */
     public function fetchOne($classType, $rawValue, string $columnName = 'id'): mixed
     {
