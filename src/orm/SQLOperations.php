@@ -27,13 +27,13 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function fetchAll($classType): array
+    public function fetchAll($classType,$whereCondition=[]): array
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "SELECT * FROM $tableName";
+        $query = "SELECT * FROM $tableName".$this->getWhereQuery($whereCondition);
         $statement = $this->connection->prepare($query);
-        $statement->execute();
+        $statement->execute($this->getWhereQueryExecutionMap($whereCondition));
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         return array_map(fn($instanceArrayResult) => $this->mapResultToClass($classType, $instanceArrayResult),
             $result);
@@ -45,13 +45,13 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException|NotFoundException
      */
-    public function fetchOne($classType, $id): mixed
+    public function fetchOne($classType,$whereCondition=[]): mixed
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "SELECT * FROM $tableName WHERE id = :id LIMIT 1";
+        $query = "SELECT * FROM $tableName".$this->getWhereQuery($whereCondition)." LIMIT 1";
         $statement = $this->connection->prepare($query);
-        $statement->execute([':id'=>$id]);
+        $statement->execute($this->getWhereQueryExecutionMap($whereCondition));
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
         if(!$instanceArrayResult) throw new NotFoundException();
         return $this->mapResultToClass($classType, $instanceArrayResult);
@@ -190,7 +190,7 @@ class SQLOperations extends DatabaseOperations
                 return $type->getName()::from($sqlValue);
             }
             $foreignClass = $type->getName();
-            return $this->fetchOne($foreignClass, $sqlValue);
+            return $this->fetchOne($foreignClass, ["id"=>$sqlValue]);
         } else {
             return $sqlValue;
         }
@@ -208,6 +208,22 @@ class SQLOperations extends DatabaseOperations
         } else {
             return $objectValue;
         }
+    }
+
+    private function getWhereQuery($whereAndConditionMap){
+        if(count($whereAndConditionMap) == 0) return "";
+        return " WHERE ".join(" AND ",array_map(function($key){
+            return "$key = :$key";
+        },array_keys($whereAndConditionMap)));
+    }
+
+    private function getWhereQueryExecutionMap($whereAndConditionMap){
+        if(count($whereAndConditionMap) == 0) return [];
+        $map = [];
+        foreach ($whereAndConditionMap as $key => $value) {
+            $map[":$key"]=$value;
+        }
+        return $map;
     }
 
     private function getInsertQuery($tableName, $reflectionProperties): string

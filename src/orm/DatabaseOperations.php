@@ -12,7 +12,7 @@ abstract class DatabaseOperations
      * @param $classType - Object or class to fetch
      * @return array - The array of object of the given types to fetch
      */
-    abstract public function fetchAll($classType): array;
+    abstract public function fetchAll($classType, $whereCondition=[]): array;
 
     /**
      * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue
@@ -20,7 +20,7 @@ abstract class DatabaseOperations
      * @param $id - The identifier of the object to fetch
      * @return mixed - The object fetched of the given type (if any)
      */
-    abstract public function fetchOne($classType, $id): mixed;
+    abstract public function fetchOne($classType, $whereCondition=[]): mixed;
 
     /**
      * Add the given object instance to the database
