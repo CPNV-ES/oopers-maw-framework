@@ -162,6 +162,7 @@ class Router
 	{
 		try {
 			$this->setMatchingRoute($this->currentRequest);
+            return $this->callRouteAction($this->matchedRoute);
 		} catch (HttpException $e) {
 			if($this->errors->containsKey($e::STATUS->name)){
 				return $this->callRouteAction($this->errors->get($e::STATUS->name));
@@ -169,7 +170,6 @@ class Router
 				return $e->getResponse();
 			}
 		}
-		return $this->callRouteAction($this->matchedRoute);
 	}
 
 	/**
