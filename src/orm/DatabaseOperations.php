@@ -47,13 +47,12 @@ abstract class DatabaseOperations
     }
 
     /**
-     * Delete a given classType where the given $sqlColumnName have a $sqlValue
+     * Delete a given classType with the given id
      * @param $classType - Class that have a Table attribute
-     * @param $rawValue - The raw value inside the database
-     * @param string $columnName - The column name to compare the raw value with
+     * @param $id - The unique identifier to delete
      * @return void
      */
-    abstract public function delete($classType, $rawValue, string $columnName = 'id'): void;
+    abstract public function delete($classType, $id): void;
 
     /**
      * Get the table name of the reflected class

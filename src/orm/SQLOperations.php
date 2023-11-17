@@ -8,7 +8,9 @@ use ReflectionClass;
 use ReflectionException;
 
 /**
- * A SQLOperations is a repository that map PDO array to php objects with Column and Table attributes
+ * A SQLOperations is a repository that map PDO array to php objects with Column and Table attributes.
+ * Contraints :
+ * 1. The table in MySQL MUST have a primary key named id, autoincremental
  */
 class SQLOperations extends DatabaseOperations
 {
@@ -35,49 +37,6 @@ class SQLOperations extends DatabaseOperations
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         return array_map(fn($instanceArrayResult) => $this->mapResultToClass($classType, $instanceArrayResult),
             $result);
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws ORMException
-     */
-    private function mapResultToClass($classType, $instanceArrayResult)
-    {
-        $reflectionClass = new ReflectionClass($classType);
-        $classInstance = new $classType();
-        $reflectionProperties = $reflectionClass->getProperties();
-        foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
-            $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getName();
-            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($classInstance,$this->getObjectValueFromSQL(
-                $instanceArrayResult[$columnName],
-                $reflectionProperty
-            ));
-        }
-        return $classInstance;
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws ORMException
-     */
-    private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
-    {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
-        $type = $reflectionProperty->getType();
-        if (!$type->isBuiltin()) {
-            if(enum_exists($type)){
-                return $type->getName()::from($sqlValue);
-            }
-            $foreignClass = $type->getName();
-            return $this->fetchOne($foreignClass, $sqlValue);
-        } else {
-            return $sqlValue;
-        }
     }
 
     /**
@@ -138,49 +97,6 @@ class SQLOperations extends DatabaseOperations
         return $idResult["id"];
     }
 
-    private function getInsertQuery($tableName, $reflectionProperties): string
-    {
-        $query = "INSERT INTO $tableName (";
-
-        $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
-            return $reflectionProperty->getName() !== "id" && count(
-                    $reflectionProperty->getAttributes(Column::class)
-                ) > 0;
-        });
-
-        $columnNames = array_map(function ($reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            $column = $columnAttribute[0]->newInstance();
-            return $column->getName();
-        }, $filteredProperties);
-
-        $query .= implode(', ', $columnNames);
-        $query .= ") VALUES (";
-
-        $parameterPlaceholders = array_map(function ($columnName) {
-            return ":$columnName";
-        }, $columnNames);
-
-        $query .= implode(', ', $parameterPlaceholders);
-        $query .= ")";
-
-        return $query;
-    }
-
-    private function getSQLValueFromObject($objectValue, $reflectionProperty)
-    {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
-        $type = $reflectionProperty->getType();
-        if (!$type->isBuiltin()) {
-            if(enum_exists($type)){
-                return $objectValue->name;
-            }
-            return $objectValue->id;
-        } else {
-            return $objectValue;
-        }
-    }
-
     /**
      * Update the given instance (with an id) in the database.
      * Note : The instance has to have the Table attribute.
@@ -228,12 +144,98 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function delete($classType, $rawValue, string $columnName = 'id'): void
+    public function delete($classType, $id): void
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "DELETE FROM $tableName WHERE :sqlColumnName = :sqlValue";
+        $query = "DELETE FROM $tableName WHERE id = :id";
         $statement = $this->connection->prepare($query);
-        $statement->execute([':sqlColumnName'=>$columnName,':sqlValue'=>$rawValue]);
+        $statement->execute([':id'=>$id]);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    private function mapResultToClass($classType, $instanceArrayResult)
+    {
+        $reflectionClass = new ReflectionClass($classType);
+        $classInstance = new $classType();
+        $reflectionProperties = $reflectionClass->getProperties();
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            if (count($columnAttribute) == 0) {
+                continue;
+            }
+            $column = $columnAttribute[0]->newInstance();
+            $columnName = $column->getName();
+            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($classInstance,$this->getObjectValueFromSQL(
+                $instanceArrayResult[$columnName],
+                $reflectionProperty
+            ));
+        }
+        return $classInstance;
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
+        $type = $reflectionProperty->getType();
+        if (!$type->isBuiltin()) {
+            if(enum_exists($type)){
+                return $type->getName()::from($sqlValue);
+            }
+            $foreignClass = $type->getName();
+            return $this->fetchOne($foreignClass, $sqlValue);
+        } else {
+            return $sqlValue;
+        }
+    }
+
+    private function getSQLValueFromObject($objectValue, $reflectionProperty)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
+        $type = $reflectionProperty->getType();
+        if (!$type->isBuiltin()) {
+            if(enum_exists($type)){
+                return $objectValue->name;
+            }
+            return $objectValue->id;
+        } else {
+            return $objectValue;
+        }
+    }
+
+    private function getInsertQuery($tableName, $reflectionProperties): string
+    {
+        $query = "INSERT INTO $tableName (";
+
+        $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
+            return $reflectionProperty->getName() !== "id" && count(
+                    $reflectionProperty->getAttributes(Column::class)
+                ) > 0;
+        });
+
+        $columnNames = array_map(function ($reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            $column = $columnAttribute[0]->newInstance();
+            return $column->getName();
+        }, $filteredProperties);
+
+        $query .= implode(', ', $columnNames);
+        $query .= ") VALUES (";
+
+        $parameterPlaceholders = array_map(function ($columnName) {
+            return ":$columnName";
+        }, $columnNames);
+
+        $query .= implode(', ', $parameterPlaceholders);
+        $query .= ")";
+
+        return $query;
     }
 }
