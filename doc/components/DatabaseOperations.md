@@ -53,5 +53,7 @@ $newUser->firstName = "Miky";
 $orm->update($newUser);
 
 //Delete
+$orm->delete($newUser);
+//OR (if the full reference isn't available)
 $orm->delete(User::class,$newUser->id);
 ```
