@@ -2,6 +2,7 @@
 
 namespace ORM;
 
+use MVC\Http\Exception\NotFoundException;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
@@ -92,6 +93,7 @@ class SQLOperations extends DatabaseOperations
         $statement = $this->connection->prepare($query);
         $statement->execute([':sqlColumnName'=>$columnName,':sqlValue'=>$rawValue]);
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
+        if(!$instanceArrayResult) throw new NotFoundException();
         return $this->mapResultToClass($classType, $instanceArrayResult);
     }
 
