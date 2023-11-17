@@ -19,13 +19,29 @@ class ChoiceField extends AbstractField
 		return $this->getOption('choices');
 	}
 
-	public function build()
+    public function setValue(mixed $value): AbstractField
+    {
+        if ($this->getOption('constraint')) {
+            $this->setError($this->getOption('constraint')($value));
+        }
+        $this->value = $value;
+        $this->updateChoices($this->getOption('choices'), $this->value);
+        $this->updateEntity();
+        return $this;
+    }
+
+	public function build(): self
 	{
 		$value = $this->getEntityGetMethod()->invoke($this->entity);
-		$this->setOption('choices', array_map(function ($choice) use ($value) {
-			return $choice->defineAsSelected($value);
-		}, $this->getOption('choices')));
+		$this->setOption('choices', $this->updateChoices($this->getOption('choices'), $value));
 		return $this;
 	}
+
+    private function updateChoices(array $choices, int|string $value): array
+    {
+        return array_map(function ($choice) use ($value) {
+            return $choice->defineAsSelected($value);
+        }, $choices);
+    }
 
 }

@@ -25,6 +25,12 @@ abstract class AbstractForm
 		$this->options = FormOptionResolverFactory::create();
 	}
 
+	public function setEntityName(string $entity_name): AbstractForm
+	{
+		$this->entity_name = $entity_name;
+		return $this;
+	}
+
 	public function addOption(string $key, mixed $value): self
 	{
 		$this->options->set($key, $value);
@@ -69,10 +75,16 @@ abstract class AbstractForm
 
 	private function bindRequest(): self
 	{
-		foreach ($this->request->data as $key => $data) {
+		foreach ($this->request->data as $key => $value) {
 			if (!array_key_exists($key, $this->fields)) continue;
 			$field = $this->getField($key);
-			$field->setValue($data);
+			if (is_array($value)) {
+				foreach ($value as $d => $item) {
+                    $field->getChildren()[$d]->setValue($item);
+				}
+			} else {
+                $field->setValue($value);
+            }
 		}
 		return $this;
 	}
@@ -87,12 +99,6 @@ abstract class AbstractForm
 	public function renderView(): FormView
 	{
 		return FormView::createFromForm($this);
-	}
-
-	public function setEntityName(string $entity_name): AbstractForm
-	{
-		$this->entity_name = $entity_name;
-		return $this;
 	}
 
 	public function getOptions(): array

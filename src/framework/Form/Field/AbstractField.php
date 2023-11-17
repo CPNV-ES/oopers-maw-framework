@@ -14,7 +14,7 @@ abstract class AbstractField
 	 */
 	private string $id;
 
-	private mixed $value;
+	protected mixed $value;
 
 	/**
 	 * Name is HTML attribute allow PHP to create $_POST associated array with name and value of field
@@ -39,6 +39,8 @@ abstract class AbstractField
 	protected object $entity;
 	private bool $changes = false;
 
+	protected array $children = [];
+
 	public function __construct(string $id, mixed $value, \ReflectionProperty $property, object $entity)
 	{
 		$this->id = $id;
@@ -55,7 +57,7 @@ abstract class AbstractField
 		if (!$propertyReflection->getDeclaringClass()->hasMethod('get' . $camelCase)) throw new FormException("Unable to find getter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
 		if (!$propertyReflection->getDeclaringClass()->hasMethod('set' . $camelCase)) throw new FormException("Unable to find setter for $property in {$propertyReflection->getDeclaringClass()->getName()}");
 
-		return (new $type(uniqid($property . '_'), $propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity), $propertyReflection, $entity))
+		return (new $type($property, $propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase)->invoke($entity), $propertyReflection, $entity))
 			->setName($property)
 			->setEntitySetMethod($propertyReflection->getDeclaringClass()->getMethod('set' . $camelCase))
 			->setEntityGetMethod($propertyReflection->getDeclaringClass()->getMethod('get' . $camelCase))
@@ -111,7 +113,7 @@ abstract class AbstractField
 		return $this->options[$key] ?? null;
 	}
 
-	private function updateEntity(): self
+	protected function updateEntity(): self
 	{
 		if ($this->getEntityValue() === $this->getValue() || $this->hasError()) return $this;
 		$this
@@ -251,9 +253,23 @@ abstract class AbstractField
 	/**
 	 * Method called after having defined all variables about the field
 	 * Must be overwritten to add specific behavior
+	 *
+	 * When overwritten method MUST return current instance
 	 * @return self
 	 */
-	public function build() {
+	public function build(): self
+	{
+		return $this;
+	}
+
+	public function getChildren(): array
+	{
+		return $this->children;
+	}
+
+	public function setChildren(array $children): AbstractField
+	{
+		$this->children = $children;
 		return $this;
 	}
 
