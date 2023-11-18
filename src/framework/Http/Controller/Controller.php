@@ -32,27 +32,27 @@ abstract class Controller
 
     /**
      * Generate a redirection response to a internal route
-    * @param string $routeName The internal name of the route
-    * @param array|null $routeParams A array of parameters used in the route
-    * @param bool $permanent Is the redirection permanent ? (301 status if yes, 302 if not)
-    * @return Response The empty body response with a Location header
-    * @throws MissingRouteParamsException
-    * @throws NotFoundRouteException
+     * @param string $routeName The internal name of the route
+     * @param array|null $routeParams A array of parameters used in the route
+     * @param HTTPStatus $status The HTTP status of redirection (temporary redirect by default)
+     * @return Response The empty body response with a Location header
+     * @throws MissingRouteParamsException
+     * @throws NotFoundRouteException
      */
-    protected function redirectToRoute(string $routeName, ?array $routeParams = null,bool $permanent = false): Response
+    protected function redirectToRoute(string $routeName, ?array $routeParams = null,HTTPStatus $status = HTTPStatus::HTTP_FOUND): Response
     {
-        return $this->redirect(Kernel::url($routeName,$routeParams),$permanent);
+        return $this->redirect(Kernel::url($routeName,$routeParams),$status);
     }
 
     /**
      * Generate a redirection response
-    * @param string $urlToRedirect The desired url to redirect
-    * @param bool $permanent Is the redirection permanent ? (301 status if yes, 302 if not)
-    * @return Response The empty body response with a Location header
+     * @param string $urlToRedirect The desired url to redirect
+     * @param HTTPStatus $status The HTTP status of redirection (temporary redirect by default)
+     * @return Response The empty body response with a Location header
      */
-    protected function redirect(string $urlToRedirect,bool $permanent = false): Response
+    protected function redirect(string $urlToRedirect, HTTPStatus $status = HTTPStatus::HTTP_FOUND): Response
     {
-        $response = new Response(status: $permanent ? HTTPStatus::HTTP_MOVED_PERMANENTLY : HTTPStatus::HTTP_FOUND);
+        $response = new Response(status: $status);
         $response->headers->set('Location', $urlToRedirect);
         return $response;
     }

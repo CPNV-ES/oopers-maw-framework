@@ -6,6 +6,7 @@ use App\Kernel;
 use MVC\Container;
 use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
+use MVC\Kernel;
 
 /**
  * Interpret Controller action parameters to bind request parameters in called method
