@@ -2,8 +2,6 @@
 
 namespace MVC\Http\Routing;
 
-use App\Kernel;
-use MVC\Container;
 use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Kernel;
