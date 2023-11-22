@@ -20,6 +20,7 @@ use Symfony\Component\Dotenv\Dotenv;
 // TODO: Implement customized HTTP Error
 class Kernel
 {
+
     protected static $_instance;
     public Container $container;
     private Router $router;
