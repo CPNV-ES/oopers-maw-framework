@@ -84,12 +84,17 @@ class Kernel
 
     public static function kernelVarsToString(string $string): string
     {
-        return str_replace(['%kernel.project_dir%'], [self::projectDir()], $string);
+        return str_replace(['%kernel.project_dir%', '%kernel.framework_dir%'], [self::projectDir(), self::frameworkDir()], $string);
     }
 
     public static function projectDir(): string
     {
         return dirname($_SERVER['DOCUMENT_ROOT']);
+    }
+
+    public static function frameworkDir(): string
+    {
+        return dirname(__DIR__ . '../', 2);
     }
 
     /**
