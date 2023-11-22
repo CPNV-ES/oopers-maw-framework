@@ -117,8 +117,8 @@ class SQLOperations extends DatabaseOperations
             if (count($columnAttribute) == 0) {
                 continue;
             }
-            $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getName();
+            $columnName = $this->getColumnName($reflectionProperty);
+            if ($columnName === 'id') continue;
             $mappedColumns[] = "$columnName = :$columnName";
         }
         $query .= join(", ", $mappedColumns);
@@ -134,7 +134,7 @@ class SQLOperations extends DatabaseOperations
                 $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
                 $reflectionProperty
             );
-            $params[":{$reflectionProperty->getName()}"] = $SQLValueFromObject;
+            $params[":{$this->getColumnName($reflectionProperty)}"] = $SQLValueFromObject;
         }
         $statement->execute($params);
     }
@@ -276,5 +276,13 @@ class SQLOperations extends DatabaseOperations
         $query .= ")";
 
         return $query;
+    }
+
+    private function getColumnName(\ReflectionProperty $property): ?string
+    {
+        $attr = $property->getAttributes(Column::class);
+        if (empty($attr)) return null;
+        $attr = $attr[0];
+        return $attr->newInstance()->getName();
     }
 }
