@@ -37,7 +37,7 @@ class ChoiceField extends AbstractField
 		return $this;
 	}
 
-    private function updateChoices(array $choices, int|string $value): array
+    private function updateChoices(array $choices, int|string|null $value): array
     {
         return array_map(function ($choice) use ($value) {
             return $choice->defineAsSelected($value);
