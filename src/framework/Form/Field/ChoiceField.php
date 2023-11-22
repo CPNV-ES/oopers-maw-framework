@@ -12,7 +12,7 @@ class ChoiceField extends AbstractField
 	}
 
 	/**
-	 * @return ChoiceParam[]
+	 * @return ChoiceOption[]
 	 */
 	public function getChoices(): array
 	{

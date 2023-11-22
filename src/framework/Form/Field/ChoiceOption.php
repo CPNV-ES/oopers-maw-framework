@@ -2,7 +2,7 @@
 
 namespace MVC\Form\Field;
 
-class ChoiceParam
+class ChoiceOption
 {
 
 	public function __construct(
