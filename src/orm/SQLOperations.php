@@ -41,7 +41,7 @@ class SQLOperations extends DatabaseOperations
 
     /**
      * Fetch an object of the given class type that have a given $id.
-     * Can throw not found exception if the PDO fetch didn't return anything.
+     * Return null if no object found.
      * @throws ReflectionException
      * @throws ORMException|NotFoundException
      */
@@ -53,7 +53,7 @@ class SQLOperations extends DatabaseOperations
         $statement = $this->connection->prepare($query);
         $statement->execute($this->getWhereQueryExecutionMap($whereCondition));
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
-        if(!$instanceArrayResult) throw new NotFoundException();
+        if(!$instanceArrayResult) return null;
         return $this->mapResultToClass($classType, $instanceArrayResult);
     }
 
@@ -210,14 +210,16 @@ class SQLOperations extends DatabaseOperations
         }
     }
 
-    private function getWhereQuery($whereAndConditionMap){
+    private function getWhereQuery($whereAndConditionMap)
+    {
         if(count($whereAndConditionMap) == 0) return "";
         return " WHERE ".join(" AND ",array_map(function($key){
             return "$key = :$key";
         },array_keys($whereAndConditionMap)));
     }
 
-    private function getWhereQueryExecutionMap($whereAndConditionMap){
+    private function getWhereQueryExecutionMap($whereAndConditionMap)
+    {
         if(count($whereAndConditionMap) == 0) return [];
         $map = [];
         foreach ($whereAndConditionMap as $key => $value) {

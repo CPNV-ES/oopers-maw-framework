@@ -2,6 +2,8 @@
 
 namespace ORM;
 
+use MVC\Http\Exception\NotFoundException;
+
 /**
 * Operate with a database in an object-oriented way (with attributes)
  */
@@ -10,17 +12,34 @@ abstract class DatabaseOperations
     /**
      * Fetch array of objects that match the given class type
      * @param $classType - Object or class to fetch
+     * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
      * @return array - The array of object of the given types to fetch
      */
-    abstract public function fetchAll($classType, $whereCondition=[]): array;
+    abstract public function fetchAll($classType, array $whereCondition=[]): array;
 
     /**
-     * Fetch an object of the given class type where the given $sqlColumnName have a $sqlValue
+     * Fetch an object of the given class type with the given conditions.
+     * Return null if no object found.
      * @param $classType - Object or class to fetch
-     * @param $id - The identifier of the object to fetch
+     * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
      * @return mixed - The object fetched of the given type (if any)
      */
-    abstract public function fetchOne($classType, $whereCondition=[]): mixed;
+    abstract public function fetchOne($classType, array $whereCondition=[]): mixed;
+
+    /**
+     * Fetch an object of the given class type with the given conditions.
+     * Can throw not found exception if the PDO fetch didn't return anything.
+     * @param $classType - Object or class to fetch
+     * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
+     * @return mixed - The object fetched of the given type (if any)
+     * @throws NotFoundException
+     */
+    public function fetchOneOrThrow($classType, array $whereCondition=[]): mixed
+    {
+        $object = $this->fetchOne();
+        if($object == null) throw new NotFoundException();
+        return $object;
+    }
 
     /**
      * Add the given object instance to the database
@@ -41,7 +60,7 @@ abstract class DatabaseOperations
      * @param $object - The object that have a Table attribute and an id property
      * @return void
      */
-    public function deleteObject($object)
+    public function deleteObject($object): void
     {
         $this->delete($object, $object->id);
     }
