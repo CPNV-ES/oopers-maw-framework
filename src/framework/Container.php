@@ -94,9 +94,5 @@ class Container
 		$instance = $reflection->newInstanceArgs($ctr_args);
 
 		return $this->instances[$key] = $instance;
-
-
 	}
-
-
 }
