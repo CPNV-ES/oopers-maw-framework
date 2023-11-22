@@ -108,10 +108,10 @@ abstract class AbstractForm
 
 	public function isValid(): bool
 	{
-		return array_reduce($this->getFields(), function ($past, $current) {
-			if (!$past) return false;
-			return !$current->hasError();
-		}, true);
+        foreach ($this->getFields() as $field) {
+            if ($field->hasError()) return false;
+        }
+        return true;
 	}
 
 	public function getFields(): array
