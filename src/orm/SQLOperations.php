@@ -193,7 +193,7 @@ class SQLOperations extends DatabaseOperations
             $foreignClass = $type->getName();
             return $this->fetchOne($foreignClass, ["id"=>$sqlValue]);
         } else {
-            return $sqlValue;
+            return $this->typeResolver->fromRawToPhpType($sqlValue,$type);
         }
     }
 
@@ -207,7 +207,7 @@ class SQLOperations extends DatabaseOperations
             }
             return $objectValue->id;
         } else {
-            return $objectValue;
+            return $this->typeResolver->fromPhpTypeToRaw($objectValue,$type);
         }
     }
 
