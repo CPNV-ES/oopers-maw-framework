@@ -10,6 +10,11 @@ use MVC\Http\Exception\NotFoundException;
 abstract class DatabaseOperations
 {
     /**
+    * @param TypeResolver $typeResolver - A type resolver capable of handling conversion between PHP types dans Database types.
+     */
+    public function __construct(protected TypeResolver $typeResolver) {}
+
+    /**
      * Fetch array of objects that match the given class type
      * @param $classType - Object or class to fetch
      * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.

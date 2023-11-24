@@ -20,6 +20,7 @@ class SQLOperations extends DatabaseOperations
      */
     public function __construct(private readonly PDO $connection)
     {
+        parent::__construct(new SQLTypeResolver());
     }
 
     /**
