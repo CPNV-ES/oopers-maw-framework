@@ -178,37 +178,18 @@ class SQLOperations extends DatabaseOperations
         return $classInstance;
     }
 
-    /**
-     * @throws ReflectionException
-     * @throws ORMException
-     */
     private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
     {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
         $type = $reflectionProperty->getType();
-        if (!$type->isBuiltin()) {
-            if(enum_exists($type)){
-                return $type->getName()::from($sqlValue);
-            }
-            $foreignClass = $type->getName();
-            return $this->fetchOne($foreignClass, ["id"=>$sqlValue]);
-        } else {
-            return $this->typeResolver->fromRawToPhpType($sqlValue,$type);
-        }
+        if($this->typeResolver->isTypeSupported($type)) return $this->typeResolver->fromRawToPhpType($sqlValue,$type);
+        else return $this->fetchOne($type->getName(), ["id"=>$sqlValue]);
     }
 
     private function getSQLValueFromObject($objectValue, $reflectionProperty)
     {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
         $type = $reflectionProperty->getType();
-        if (!$type->isBuiltin()) {
-            if(enum_exists($type)){
-                return $objectValue->name;
-            }
-            return $objectValue->id;
-        } else {
-            return $this->typeResolver->fromPhpTypeToRaw($objectValue,$type);
-        }
+        if($this->typeResolver->isTypeSupported($type)) return $this->typeResolver->fromPhpTypeToRaw($objectValue,$type);
+        else return $objectValue->id;
     }
 
     private function getWhereQuery($whereAndConditionMap)
