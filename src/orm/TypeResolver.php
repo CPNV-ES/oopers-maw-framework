@@ -2,25 +2,20 @@
 
 namespace ORM;
 
+use ReflectionNamedType;
+
 abstract class TypeResolver
 {
+    abstract public function isTypeSupported(ReflectionNamedType $type):bool;
     /**
      * Resolve a php builtin type from a raw value to the associated PHP type.
      * @throws ORMException
      */
-    public function fromRawToPhpType($raw, $type)
-    {
-        if (!$type->isBuiltin()) throw new ORMException("The TypeResolver can only handle builtin php types");
-        return $raw;
-    }
+    abstract public function fromRawToPhpType(Mixed $raw, ReflectionNamedType $type):Mixed;
 
     /**
      * Return a raw value from an object of the associated PHP type.
      * @throws ORMException
      */
-    public function fromPhpTypeToRaw($object, $type)
-    {
-        if (!$type->isBuiltin()) throw new ORMException("The TypeResolver can only handle builtin php types");
-        return $object;
-    }
+    abstract public function fromPhpTypeToRaw(Mixed $object,ReflectionNamedType $type):Mixed;
 }
