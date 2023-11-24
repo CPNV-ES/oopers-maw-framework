@@ -2,6 +2,7 @@
 
 namespace ORM;
 
+use DateTime;
 use ORM\TypeResolver;
 use ReflectionNamedType;
 
@@ -20,7 +21,7 @@ class SQLTypeResolver extends TypeResolver
         if($type->isBuiltin()) return $raw;
         $stringType = $type->getName();
         if(enum_exists($type)) return $stringType::from($raw);
-        if($stringType == "DateTime") return strtotime($raw);
+        if($stringType == "DateTime") return new DateTime($raw);
         return null;
     }
 
