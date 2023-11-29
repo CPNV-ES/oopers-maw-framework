@@ -123,4 +123,12 @@ abstract class DatabaseOperations
         }
         return $reflectionClass->getMethod($methodName);
     }
+
+    protected function getColumnName(\ReflectionProperty $property): ?string
+    {
+        $attr = $property->getAttributes(Column::class);
+        if (empty($attr)) return null;
+        $attr = $attr[0];
+        return $attr->newInstance()->getName();
+    }
 }
