@@ -6,6 +6,7 @@ use MVC\Http\Exception\NotFoundException;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionProperty;
 
 /**
  * A SQLOperations is a repository that map PDO array to php objects with Column and Table attributes.
@@ -28,7 +29,7 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function fetchAll($classType,$whereCondition=[]): array
+    public function fetchAll(object|string $classType,$whereCondition=[]): array
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
@@ -46,7 +47,8 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException|NotFoundException
      */
-    public function fetchOne($classType,$whereCondition=[]): mixed
+    public function fetchOne(
+        object|string $classType,$whereCondition=[]): object|null
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
@@ -64,7 +66,7 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function create($instance): int
+    public function create(object $instance): int
     {
         $reflectionClass = new ReflectionClass($instance);
         $reflectionProperties = $reflectionClass->getProperties();
@@ -104,7 +106,8 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function update($instance): void
+    public function update(
+        object $instance): void
     {
         $classType = get_class($instance);
         $reflectionClass = new ReflectionClass($classType);
@@ -145,7 +148,7 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function delete($classType, $id): void
+    public function delete(object|string $classType, int $id): void
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
@@ -158,7 +161,7 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    private function mapResultToClass($classType, $instanceArrayResult)
+    private function mapResultToClass(object|string $classType, array $instanceArrayResult)
     {
         $reflectionClass = new ReflectionClass($classType);
         $classInstance = new $classType();
@@ -178,21 +181,21 @@ class SQLOperations extends DatabaseOperations
         return $classInstance;
     }
 
-    private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
+    private function getObjectValueFromSQL($sqlValue, ReflectionProperty $reflectionProperty)
     {
         $type = $reflectionProperty->getType();
         if($this->typeResolver->isTypeSupported($type)) return $this->typeResolver->fromRawToPhpType($sqlValue,$type);
         else return $this->fetchOne($type->getName(), ["id"=>$sqlValue]);
     }
 
-    private function getSQLValueFromObject($objectValue, $reflectionProperty)
+    private function getSQLValueFromObject(object $objectValue, ReflectionProperty $reflectionProperty)
     {
         $type = $reflectionProperty->getType();
         if($this->typeResolver->isTypeSupported($type)) return $this->typeResolver->fromPhpTypeToRaw($objectValue,$type);
         else return $objectValue->id;
     }
 
-    private function getWhereQuery($whereAndConditionMap)
+    private function getWhereQuery(array $whereAndConditionMap): string
     {
         if(count($whereAndConditionMap) == 0) return "";
         return " WHERE ".join(" AND ",array_map(function($key){
@@ -200,7 +203,7 @@ class SQLOperations extends DatabaseOperations
         },array_keys($whereAndConditionMap)));
     }
 
-    private function getWhereQueryExecutionMap($whereAndConditionMap)
+    private function getWhereQueryExecutionMap(array $whereAndConditionMap): array
     {
         if(count($whereAndConditionMap) == 0) return [];
         $map = [];
@@ -210,7 +213,7 @@ class SQLOperations extends DatabaseOperations
         return $map;
     }
 
-    private function getInsertQuery($tableName, $reflectionProperties): string
+    private function getInsertQuery(string $tableName, array $reflectionProperties): string
     {
         $query = "INSERT INTO $tableName (";
 
