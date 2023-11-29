@@ -90,7 +90,7 @@ class SQLOperations extends DatabaseOperations
                 $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
                 $reflectionProperty
             );
-            $params[":{$columnName->newInstance()->getName()}"] = $SQLValueFromObject;
+            $params[":$columnName"] = $SQLValueFromObject;
         }
         $statement->execute($params);
         //If success, return the id of the instance
@@ -187,8 +187,7 @@ class SQLOperations extends DatabaseOperations
         $classInstance = new $classType();
         $reflectionProperties = $reflectionClass->getProperties();
         foreach ($reflectionProperties as $reflectionProperty) {
-            $column =$this->getColumnName($reflectionProperty)->newInstance();
-            $columnName = $column->getName();
+            $columnName = $this->getColumnName($reflectionProperty);
             $this->getMethodOfProperty($reflectionClass, $reflectionProperty, false)->invoke(
                 $classInstance,
                 $this->getObjectValueFromSQL(
@@ -221,8 +220,7 @@ class SQLOperations extends DatabaseOperations
         });
 
         $columnNames = array_map(function ($reflectionProperty) {
-            $column = $this->getColumnName($reflectionProperty)->newInstance();
-            return $column->getName();
+            return $this->getColumnName($reflectionProperty);
         }, $filteredProperties);
 
         $query .= implode(', ', $columnNames);
