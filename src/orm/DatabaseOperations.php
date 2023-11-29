@@ -41,7 +41,7 @@ abstract class DatabaseOperations
      */
     public function fetchOneOrThrow($classType, array $whereCondition=[]): mixed
     {
-        $object = $this->fetchOne();
+        $object = $this->fetchOne($classType,$whereCondition);
         if($object == null) throw new NotFoundException();
         return $object;
     }
