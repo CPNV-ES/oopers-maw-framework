@@ -36,9 +36,11 @@ You can now create an index.php with the following content :
 ```php
 <?php
 
+use MVC\Kernel;
+
 require '../vendor/autoload.php';
-//Launch the MVC framework via its kernel.
-new \MVC\Kernel("../.env");
+//Launch the MVC framework via its kernel and execute the route
+(new Kernel("../.env"))->executeRoute();
 //The parameter is the dotenv file path. You will need a .env in the parent folder in this situation.
 ```
 
@@ -48,9 +50,7 @@ new \MVC\Kernel("../.env");
     - Controller \
       _All controllers from the App will be put here._
 - **views/** \
-  _All views will be put here. (Or in a sub folder)_
-  - templates/ \
-    _All layouts will be put here. (Or in a sub folder)_
+  _All views and layout will be put here. (Or in a sub folder)_
 
 ## Controllers
 All the Classes that **inherit** from MVC\Http\Controller\Controller **inside the src/Controller folder** (namespace App/Controller) will be taken in consideration when building routes.
