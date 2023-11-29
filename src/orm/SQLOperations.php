@@ -117,8 +117,8 @@ class SQLOperations extends DatabaseOperations
             if (count($columnAttribute) == 0) {
                 continue;
             }
-            $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getName();
+            $columnName = $this->getColumnName($reflectionProperty);
+            if ($columnName === 'id') continue;
             $mappedColumns[] = "$columnName = :$columnName";
         }
         $query .= join(", ", $mappedColumns);
@@ -134,7 +134,7 @@ class SQLOperations extends DatabaseOperations
                 $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
                 $reflectionProperty
             );
-            $params[":{$reflectionProperty->getName()}"] = $SQLValueFromObject;
+            $params[":{$this->getColumnName($reflectionProperty)}"] = $SQLValueFromObject;
         }
         $statement->execute($params);
     }
@@ -177,14 +177,21 @@ class SQLOperations extends DatabaseOperations
         return $classInstance;
     }
 
-    /**
-     * @throws ReflectionException
-     * @throws ORMException
-     */
     private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
     {
-        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
-        $type = $reflectionProperty->getType();
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
+        return $this->getObjectValueForTypedParameter($sqlValue, $reflectionProperty->getType());
+    }
+
+    private function getObjectValueForTypedParameter($sqlValue, \ReflectionUnionType|\ReflectionNamedType $type)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $subType) {
+                if ($subType->getName() === 'int' && is_int($sqlValue)) return $sqlValue;
+                return $this->getObjectValueForTypedParameter($sqlValue, $subType);
+            }
+        }
         if (!$type->isBuiltin()) {
             if(enum_exists($type)){
                 return $type->getName()::from($sqlValue);
@@ -199,12 +206,26 @@ class SQLOperations extends DatabaseOperations
     private function getSQLValueFromObject($objectValue, $reflectionProperty)
     {
         //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
-        $type = $reflectionProperty->getType();
+        return $this->getSQLValueForTypedParameter($objectValue, $reflectionProperty->getType());
+    }
+
+    private function getSQLValueForTypedParameter($objectValue, \ReflectionUnionType|\ReflectionNamedType $type)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $subType) {
+                if ($subType->getName() === 'int' && is_int($objectValue)) return $objectValue;
+                return $this->getSQLValueForTypedParameter($objectValue, $subType);
+            }
+        }
         if (!$type->isBuiltin()) {
-            if(enum_exists($type)){
+            if(enum_exists($type)) {
                 return $objectValue->name;
             }
-            return $objectValue->id;
+            if (method_exists($objectValue, 'getId')) {
+                return $objectValue->getId();
+            }
+            throw new ORMException("Unable to resolve identifier of `".get_class($objectValue)."`");
         } else {
             return $objectValue;
         }
@@ -214,8 +235,8 @@ class SQLOperations extends DatabaseOperations
     {
         if(count($whereAndConditionMap) == 0) return "";
         return " WHERE ".join(" AND ",array_map(function($key){
-            return "$key = :$key";
-        },array_keys($whereAndConditionMap)));
+                return "$key = :$key";
+            },array_keys($whereAndConditionMap)));
     }
 
     private function getWhereQueryExecutionMap($whereAndConditionMap)
@@ -255,5 +276,13 @@ class SQLOperations extends DatabaseOperations
         $query .= ")";
 
         return $query;
+    }
+
+    private function getColumnName(\ReflectionProperty $property): ?string
+    {
+        $attr = $property->getAttributes(Column::class);
+        if (empty($attr)) return null;
+        $attr = $attr[0];
+        return $attr->newInstance()->getName();
     }
 }
