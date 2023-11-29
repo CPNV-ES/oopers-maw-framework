@@ -84,16 +84,13 @@ class SQLOperations extends DatabaseOperations
             if ($reflectionProperty->getName() == "id") {
                 continue;
             }
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
-
+            //TODO : Handle if column name is null
+            $columnName = $this->getColumnName($reflectionProperty);
             $SQLValueFromObject = $this->getSQLValueFromObject(
                 $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
                 $reflectionProperty
             );
-            $params[":{$columnAttribute[0]->newInstance()->getName()}"] = $SQLValueFromObject;
+            $params[":{$columnName->newInstance()->getName()}"] = $SQLValueFromObject;
         }
         $statement->execute($params);
         //If success, return the id of the instance
@@ -123,10 +120,6 @@ class SQLOperations extends DatabaseOperations
         $mappedColumns = [];
 
         foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
             $columnName = $this->getColumnName($reflectionProperty);
             if ($columnName === 'id') continue;
             $mappedColumns[] = "$columnName = :$columnName";
@@ -136,10 +129,6 @@ class SQLOperations extends DatabaseOperations
         $statement = $this->connection->prepare($query);
         $params = [];
         foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
             $SQLValueFromObject = $this->getSQLValueFromObject(
                 $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
                 $reflectionProperty
@@ -198,11 +187,7 @@ class SQLOperations extends DatabaseOperations
         $classInstance = new $classType();
         $reflectionProperties = $reflectionClass->getProperties();
         foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
-            $column = $columnAttribute[0]->newInstance();
+            $column =$this->getColumnName($reflectionProperty)->newInstance();
             $columnName = $column->getName();
             $this->getMethodOfProperty($reflectionClass, $reflectionProperty, false)->invoke(
                 $classInstance,
@@ -232,14 +217,11 @@ class SQLOperations extends DatabaseOperations
         $query = "INSERT INTO $tableName (";
 
         $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
-            return $reflectionProperty->getName() !== "id" && count(
-                    $reflectionProperty->getAttributes(Column::class)
-                ) > 0;
+            return $reflectionProperty->getName() !== "id" && $this->getColumnName($reflectionProperty) != null;
         });
 
         $columnNames = array_map(function ($reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            $column = $columnAttribute[0]->newInstance();
+            $column = $this->getColumnName($reflectionProperty)->newInstance();
             return $column->getName();
         }, $filteredProperties);
 
