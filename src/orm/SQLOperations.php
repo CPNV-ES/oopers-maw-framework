@@ -29,16 +29,78 @@ class SQLOperations extends DatabaseOperations
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function fetchAll(object|string $classType,$whereCondition=[]): array
+    public function fetchAll(object|string $classType, $whereCondition = []): array
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "SELECT * FROM $tableName".$this->getWhereQuery($whereCondition);
+        $query = "SELECT * FROM $tableName" . $this->getWhereQuery($whereCondition);
         $statement = $this->connection->prepare($query);
         $statement->execute($this->getWhereQueryExecutionMap($whereCondition));
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         return array_map(fn($instanceArrayResult) => $this->mapResultToClass($classType, $instanceArrayResult),
             $result);
+    }
+
+    private function getWhereQuery(array $whereAndConditionMap): string
+    {
+        if (count($whereAndConditionMap) == 0) {
+            return "";
+        }
+        return " WHERE " . join(
+                " AND ",
+                array_map(function ($key) {
+                    return "$key = :$key";
+                }, array_keys($whereAndConditionMap))
+            );
+    }
+
+    private function getWhereQueryExecutionMap(array $whereAndConditionMap): array
+    {
+        if (count($whereAndConditionMap) == 0) {
+            return [];
+        }
+        $map = [];
+        foreach ($whereAndConditionMap as $key => $value) {
+            $map[":$key"] = $value;
+        }
+        return $map;
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    private function mapResultToClass(object|string $classType, array $instanceArrayResult)
+    {
+        $reflectionClass = new ReflectionClass($classType);
+        $classInstance = new $classType();
+        $reflectionProperties = $reflectionClass->getProperties();
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            if (count($columnAttribute) == 0) {
+                continue;
+            }
+            $column = $columnAttribute[0]->newInstance();
+            $columnName = $column->getName();
+            $this->getMethodOfProperty($reflectionClass, $reflectionProperty, false)->invoke(
+                $classInstance,
+                $this->getObjectValueFromSQL(
+                    $instanceArrayResult[$columnName],
+                    $reflectionProperty
+                )
+            );
+        }
+        return $classInstance;
+    }
+
+    private function getObjectValueFromSQL($sqlValue, ReflectionProperty $reflectionProperty)
+    {
+        $type = $reflectionProperty->getType();
+        if ($this->typeResolver->isTypeSupported($type)) {
+            return $this->typeResolver->fromRawToPhpType($sqlValue, $type);
+        } else {
+            return $this->fetchOne($type->getName(), ["id" => $sqlValue]);
+        }
     }
 
     /**
@@ -48,15 +110,18 @@ class SQLOperations extends DatabaseOperations
      * @throws ORMException|NotFoundException
      */
     public function fetchOne(
-        object|string $classType,$whereCondition=[]): object|null
-    {
+        object|string $classType,
+        $whereCondition = []
+    ): object|null {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "SELECT * FROM $tableName".$this->getWhereQuery($whereCondition)." LIMIT 1";
+        $query = "SELECT * FROM $tableName" . $this->getWhereQuery($whereCondition) . " LIMIT 1";
         $statement = $this->connection->prepare($query);
         $statement->execute($this->getWhereQueryExecutionMap($whereCondition));
         $instanceArrayResult = $statement->fetch(PDO::FETCH_ASSOC);
-        if(!$instanceArrayResult) return null;
+        if (!$instanceArrayResult) {
+            return null;
+        }
         return $this->mapResultToClass($classType, $instanceArrayResult);
     }
 
@@ -86,7 +151,7 @@ class SQLOperations extends DatabaseOperations
             }
 
             $SQLValueFromObject = $this->getSQLValueFromObject(
-                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
+                $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
                 $reflectionProperty
             );
             $params[":{$columnAttribute[0]->newInstance()->getName()}"] = $SQLValueFromObject;
@@ -98,119 +163,6 @@ class SQLOperations extends DatabaseOperations
         $idStatement->execute();
         $idResult = $idStatement->fetch(PDO::FETCH_ASSOC);
         return $idResult["id"];
-    }
-
-    /**
-     * Update the given instance (with an id) in the database.
-     * Note : The instance has to have the Table attribute.
-     * @throws ReflectionException
-     * @throws ORMException
-     */
-    public function update(
-        object $instance): void
-    {
-        $classType = get_class($instance);
-        $reflectionClass = new ReflectionClass($classType);
-        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "UPDATE $tableName SET ";
-        $reflectionProperties = $reflectionClass->getProperties();
-        $mappedColumns = [];
-
-        foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
-            $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getName();
-            $mappedColumns[] = "$columnName = :$columnName";
-        }
-        $query .= join(", ", $mappedColumns);
-        $query .= " WHERE id = :id";
-        $statement = $this->connection->prepare($query);
-        $params = [];
-        foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
-            $SQLValueFromObject = $this->getSQLValueFromObject(
-                $this->getMethodOfProperty($reflectionClass,$reflectionProperty,true)->invoke($instance),
-                $reflectionProperty
-            );
-            $params[":{$reflectionProperty->getName()}"] = $SQLValueFromObject;
-        }
-        $statement->execute($params);
-    }
-
-    /**
-     * Delete a given classType (that have a Table attribute) where the given $sqlColumnName have a $sqlValue
-     * @throws ReflectionException
-     * @throws ORMException
-     */
-    public function delete(object|string $classType, int $id): void
-    {
-        $reflectionClass = new ReflectionClass($classType);
-        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
-        $query = "DELETE FROM $tableName WHERE id = :id";
-        $statement = $this->connection->prepare($query);
-        $statement->execute([':id'=>$id]);
-    }
-
-    /**
-     * @throws ReflectionException
-     * @throws ORMException
-     */
-    private function mapResultToClass(object|string $classType, array $instanceArrayResult)
-    {
-        $reflectionClass = new ReflectionClass($classType);
-        $classInstance = new $classType();
-        $reflectionProperties = $reflectionClass->getProperties();
-        foreach ($reflectionProperties as $reflectionProperty) {
-            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
-            if (count($columnAttribute) == 0) {
-                continue;
-            }
-            $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getName();
-            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($classInstance,$this->getObjectValueFromSQL(
-                $instanceArrayResult[$columnName],
-                $reflectionProperty
-            ));
-        }
-        return $classInstance;
-    }
-
-    private function getObjectValueFromSQL($sqlValue, ReflectionProperty $reflectionProperty)
-    {
-        $type = $reflectionProperty->getType();
-        if($this->typeResolver->isTypeSupported($type)) return $this->typeResolver->fromRawToPhpType($sqlValue,$type);
-        else return $this->fetchOne($type->getName(), ["id"=>$sqlValue]);
-    }
-
-    private function getSQLValueFromObject(object $objectValue, ReflectionProperty $reflectionProperty)
-    {
-        $type = $reflectionProperty->getType();
-        if($this->typeResolver->isTypeSupported($type)) return $this->typeResolver->fromPhpTypeToRaw($objectValue,$type);
-        else return $objectValue->id;
-    }
-
-    private function getWhereQuery(array $whereAndConditionMap): string
-    {
-        if(count($whereAndConditionMap) == 0) return "";
-        return " WHERE ".join(" AND ",array_map(function($key){
-            return "$key = :$key";
-        },array_keys($whereAndConditionMap)));
-    }
-
-    private function getWhereQueryExecutionMap(array $whereAndConditionMap): array
-    {
-        if(count($whereAndConditionMap) == 0) return [];
-        $map = [];
-        foreach ($whereAndConditionMap as $key => $value) {
-            $map[":$key"]=$value;
-        }
-        return $map;
     }
 
     private function getInsertQuery(string $tableName, array $reflectionProperties): string
@@ -240,5 +192,72 @@ class SQLOperations extends DatabaseOperations
         $query .= ")";
 
         return $query;
+    }
+
+    private function getSQLValueFromObject(object $objectValue, ReflectionProperty $reflectionProperty)
+    {
+        $type = $reflectionProperty->getType();
+        if ($this->typeResolver->isTypeSupported($type)) {
+            return $this->typeResolver->fromPhpTypeToRaw($objectValue, $type);
+        } else {
+            return $objectValue->id;
+        }
+    }
+
+    /**
+     * Update the given instance (with an id) in the database.
+     * Note : The instance has to have the Table attribute.
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    public function update(
+        object $instance
+    ): void {
+        $classType = get_class($instance);
+        $reflectionClass = new ReflectionClass($classType);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
+        $query = "UPDATE $tableName SET ";
+        $reflectionProperties = $reflectionClass->getProperties();
+        $mappedColumns = [];
+
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            if (count($columnAttribute) == 0) {
+                continue;
+            }
+            $column = $columnAttribute[0]->newInstance();
+            $columnName = $column->getName();
+            $mappedColumns[] = "$columnName = :$columnName";
+        }
+        $query .= join(", ", $mappedColumns);
+        $query .= " WHERE id = :id";
+        $statement = $this->connection->prepare($query);
+        $params = [];
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            if (count($columnAttribute) == 0) {
+                continue;
+            }
+            $SQLValueFromObject = $this->getSQLValueFromObject(
+                $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
+                $reflectionProperty
+            );
+            $params[":{$reflectionProperty->getName()}"] = $SQLValueFromObject;
+        }
+        $statement->execute($params);
+    }
+
+    /**
+     * Delete a given classType (that have a Table attribute) where the given $sqlColumnName have a $sqlValue
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    public function delete(object|string $classType, int $id): void
+    {
+        $reflectionClass = new ReflectionClass($classType);
+        $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
+        $query = "DELETE FROM $tableName WHERE id = :id";
+        $statement = $this->connection->prepare($query);
+        $statement->execute([':id' => $id]);
     }
 }

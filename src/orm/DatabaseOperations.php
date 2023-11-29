@@ -6,14 +6,16 @@ use MVC\Http\Exception\NotFoundException;
 use ReflectionClass;
 
 /**
-* Operate with a database in an object-oriented way (with attributes)
+ * Operate with a database in an object-oriented way (with attributes)
  */
 abstract class DatabaseOperations
 {
     /**
-    * @param TypeResolver $typeResolver - A type resolver capable of handling conversion between PHP types dans Database types.
+     * @param TypeResolver $typeResolver - A type resolver capable of handling conversion between PHP types dans Database types.
      */
-    public function __construct(protected TypeResolver $typeResolver) {}
+    public function __construct(protected TypeResolver $typeResolver)
+    {
+    }
 
     /**
      * Fetch array of objects that match the given class type
@@ -22,17 +24,9 @@ abstract class DatabaseOperations
      * @return array - The array of object of the given types to fetch
      */
     abstract public function fetchAll(
-        object|string $classType, array $whereCondition=[]): array;
-
-    /**
-     * Fetch an object of the given class type with the given conditions.
-     * Return null if no object found.
-     * @param $classType - Object or class to fetch
-     * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
-     * @return mixed - The object fetched of the given type (if any)
-     */
-    abstract public function fetchOne(
-        object|string $classType, array $whereCondition=[]): object|null;
+        object|string $classType,
+        array $whereCondition = []
+    ): array;
 
     /**
      * Fetch an object of the given class type with the given conditions.
@@ -43,12 +37,27 @@ abstract class DatabaseOperations
      * @throws NotFoundException
      */
     public function fetchOneOrThrow(
-        object|string $classType, array $whereCondition=[]): object
-    {
-        $object = $this->fetchOne($classType,$whereCondition);
-        if($object == null) throw new NotFoundException();
+        object|string $classType,
+        array $whereCondition = []
+    ): object {
+        $object = $this->fetchOne($classType, $whereCondition);
+        if ($object == null) {
+            throw new NotFoundException();
+        }
         return $object;
     }
+
+    /**
+     * Fetch an object of the given class type with the given conditions.
+     * Return null if no object found.
+     * @param $classType - Object or class to fetch
+     * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
+     * @return mixed - The object fetched of the given type (if any)
+     */
+    abstract public function fetchOne(
+        object|string $classType,
+        array $whereCondition = []
+    ): object|null;
 
     /**
      * Add the given object instance to the database
@@ -56,7 +65,8 @@ abstract class DatabaseOperations
      * @return int - The identifier of object once insert in the db
      */
     abstract public function create(
-        object $instance): int;
+        object $instance
+    ): int;
 
     /**
      * Update the given instance (with an id) in the database.
@@ -102,10 +112,15 @@ abstract class DatabaseOperations
      * Get the public (getter if read = true / setter if read = false) method of the given private property to access it
      * @throws ORMException
      */
-    protected function getMethodOfProperty($reflectionClass,$reflectionProperty,$read){
+    protected function getMethodOfProperty($reflectionClass, $reflectionProperty, $read)
+    {
         $propertyName = $reflectionProperty->getName();
-        $methodName = ($read?'get':'set').str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
-        if(!$reflectionClass->hasMethod($methodName)) throw new ORMException("The attribute $propertyName of $reflectionClass->name has no method called $methodName");
+        $methodName = ($read ? 'get' : 'set') . str_replace(['_'], [''], ucwords($propertyName, "\t\r\n\f\v_"));
+        if (!$reflectionClass->hasMethod($methodName)) {
+            throw new ORMException(
+                "The attribute $propertyName of $reflectionClass->name has no method called $methodName"
+            );
+        }
         return $reflectionClass->getMethod($methodName);
     }
 }
