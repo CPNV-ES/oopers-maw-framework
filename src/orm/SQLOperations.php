@@ -96,6 +96,8 @@ class SQLOperations extends DatabaseOperations
     private function getObjectValueFromSQL($sqlValue, ReflectionProperty $reflectionProperty)
     {
         $type = $reflectionProperty->getType();
+        //TODO: Better implementation. For now, if it's union type, we only take the first type
+        if($type instanceof \ReflectionUnionType) $type = $type->getTypes()[0];
         if ($this->typeResolver->isTypeSupported($type)) {
             return $this->typeResolver->fromRawToPhpType($sqlValue, $type);
         } else {
@@ -197,6 +199,8 @@ class SQLOperations extends DatabaseOperations
     private function getSQLValueFromObject(object $objectValue, ReflectionProperty $reflectionProperty)
     {
         $type = $reflectionProperty->getType();
+        //TODO: Better implementation. For now, if it's union type, we only take the first type
+        if($type instanceof \ReflectionUnionType) $type = $type->getTypes()[0];
         if ($this->typeResolver->isTypeSupported($type)) {
             return $this->typeResolver->fromPhpTypeToRaw($objectValue, $type);
         } else {
