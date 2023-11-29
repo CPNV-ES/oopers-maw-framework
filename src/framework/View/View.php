@@ -41,7 +41,7 @@ class View implements ViewInterface
 	 */
 	private function get(string $name): mixed
 	{
-		return $this->context[$name];
+		return array_key_exists($name, $this->context) ? $this->context[$name] : null;
 	}
 
 	public function __toString(): string

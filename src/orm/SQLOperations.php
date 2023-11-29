@@ -225,8 +225,8 @@ class SQLOperations extends DatabaseOperations
             if (count($columnAttribute) == 0) {
                 continue;
             }
-            $column = $columnAttribute[0]->newInstance();
-            $columnName = $column->getName();
+            $columnName = $this->getColumnName($reflectionProperty);
+            if ($columnName === 'id') continue;
             $mappedColumns[] = "$columnName = :$columnName";
         }
         $query .= join(", ", $mappedColumns);
@@ -242,7 +242,7 @@ class SQLOperations extends DatabaseOperations
                 $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
                 $reflectionProperty
             );
-            $params[":{$reflectionProperty->getName()}"] = $SQLValueFromObject;
+            $params[":{$this->getColumnName($reflectionProperty)}"] = $SQLValueFromObject;
         }
         $statement->execute($params);
     }
@@ -259,5 +259,109 @@ class SQLOperations extends DatabaseOperations
         $query = "DELETE FROM $tableName WHERE id = :id";
         $statement = $this->connection->prepare($query);
         $statement->execute([':id' => $id]);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    private function mapResultToClass($classType, $instanceArrayResult)
+    {
+        $reflectionClass = new ReflectionClass($classType);
+        $classInstance = new $classType();
+        $reflectionProperties = $reflectionClass->getProperties();
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            if (count($columnAttribute) == 0) {
+                continue;
+            }
+            $column = $columnAttribute[0]->newInstance();
+            $columnName = $column->getName();
+            $this->getMethodOfProperty($reflectionClass,$reflectionProperty,false)->invoke($classInstance,$this->getObjectValueFromSQL(
+                $instanceArrayResult[$columnName],
+                $reflectionProperty
+            ));
+        }
+        return $classInstance;
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ORMException
+     */
+    private function getObjectValueFromSQL($sqlValue, $reflectionProperty)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to fetch the object
+        $type = $reflectionProperty->getType();
+        if (!$type->isBuiltin()) {
+            if(enum_exists($type)){
+                return $type->getName()::from($sqlValue);
+            }
+            $foreignClass = $type->getName();
+            return $this->fetchOne($foreignClass, ["id"=>$sqlValue]);
+        } else {
+            return $sqlValue;
+        }
+    }
+
+    private function getSQLValueFromObject($objectValue, $reflectionProperty)
+    {
+        //If $reflectionProperty->getType() is a class that has the Table attribute, then it is a foreign key, so we need to get the id
+        $type = $reflectionProperty->getType();
+        if (!$type->isBuiltin()) {
+            if(enum_exists($type)){
+                return $objectValue->name;
+            }
+            return $objectValue->id;
+        } else {
+            return $objectValue;
+        }
+    }
+
+    private function getWhereQuery($whereAndConditionMap)
+    {
+        if(count($whereAndConditionMap) == 0) return "";
+        return " WHERE ".join(" AND ",array_map(function($key){
+            return "$key = :$key";
+        },array_keys($whereAndConditionMap)));
+    }
+
+    private function getWhereQueryExecutionMap($whereAndConditionMap)
+    {
+        if(count($whereAndConditionMap) == 0) return [];
+        $map = [];
+        foreach ($whereAndConditionMap as $key => $value) {
+            $map[":$key"]=$value;
+        }
+        return $map;
+    }
+
+    private function getInsertQuery($tableName, $reflectionProperties): string
+    {
+        $query = "INSERT INTO $tableName (";
+
+        $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
+            return $reflectionProperty->getName() !== "id" && count(
+                    $reflectionProperty->getAttributes(Column::class)
+                ) > 0;
+        });
+
+        $columnNames = array_map(function ($reflectionProperty) {
+            $columnAttribute = $reflectionProperty->getAttributes(Column::class);
+            $column = $columnAttribute[0]->newInstance();
+            return $column->getName();
+        }, $filteredProperties);
+
+        $query .= implode(', ', $columnNames);
+        $query .= ") VALUES (";
+
+        $parameterPlaceholders = array_map(function ($columnName) {
+            return ":$columnName";
+        }, $columnNames);
+
+        $query .= implode(', ', $parameterPlaceholders);
+        $query .= ")";
+
+        return $query;
     }
 }
