@@ -6,8 +6,12 @@
         "psr-4": {
             "MVC\\": "src/framework/",
             "ORM\\": "src/orm/",
-            "App\\": "app/",
-            "Tests\\": "tests"
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
         }
     },
     "require": {
