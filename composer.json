@@ -8,6 +8,11 @@
             "ORM\\": "src/orm/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": "^8.2",
         "doctrine/collections": "^2.1",
