@@ -57,7 +57,7 @@ class EntityField extends TextField
     public function render(): string
     {
         return array_reduce($this->children, function ($curs, $field) {
-            $curs .= (new FieldView($this->getOption('view_template'), ['field' => $field]))->render();
+            $curs .= (new FieldView($field->getOption('view_template'), ['field' => $field]))->render();
             return $curs;
         }, "");
     }
