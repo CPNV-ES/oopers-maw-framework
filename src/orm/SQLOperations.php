@@ -244,7 +244,7 @@ class SQLOperations extends DatabaseOperations
         if ($this->typeResolver->isTypeSupported($type)) {
             return $this->typeResolver->fromPhpTypeToRaw($objectValue, $type);
         } else {
-            return $objectValue->id;
+            return $objectValue->getId();
         }
     }
 }
