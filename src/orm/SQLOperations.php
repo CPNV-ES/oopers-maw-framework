@@ -236,7 +236,7 @@ class SQLOperations extends DatabaseOperations
         return $query;
     }
 
-    private function getSQLValueFromObject(object $objectValue, ReflectionProperty $reflectionProperty)
+    private function getSQLValueFromObject(mixed $objectValue, ReflectionProperty $reflectionProperty)
     {
         $type = $reflectionProperty->getType();
         //TODO: Better implementation. For now, if it's union type, we only take the first type
