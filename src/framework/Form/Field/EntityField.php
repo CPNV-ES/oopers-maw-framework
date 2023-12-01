@@ -20,7 +20,7 @@ class EntityField extends TextField
             $labelvalue = (new \ReflectionMethod($entity, 'get' . ucfirst($this->getOption('entity_label'))))->invoke(
                 $entity
             );
-            $fieldType = $this->resolveFieldType();
+            $fieldType = $this->resolveFieldType($entity);
             $field = (self::createFromFormBuilder(
                 $this->getOption('entity_value'),
                 $fieldType,
@@ -42,14 +42,14 @@ class EntityField extends TextField
     }
 
 
-    private function resolveFieldType(): string
+    private function resolveFieldType($entity): string
     {
         if (!array_key_exists('entity_type', $this->getOptions())) {
             return TextField::class;
         }
         $type = $this->getOption('entity_type');
         if (is_callable($type)) {
-            return $type($this->getEntity());
+            return $type($entity);
         }
         return $type;
     }
