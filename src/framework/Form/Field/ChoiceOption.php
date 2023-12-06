@@ -19,7 +19,7 @@ class ChoiceOption
 
 	public function defineAsSelected($value): self
 	{
-		$this->selected = $this->value === $value;
+		$this->selected = $this->value == $value;
 		return $this;
 	}
 }
