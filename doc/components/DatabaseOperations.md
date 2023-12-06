@@ -50,7 +50,7 @@ In a model, you can use the DBORM with a PDO connected to your database to make 
 //$dbOperation = new SQLOperations($pdoConnection);
 //Fetch
 $allUsers = $dbOperation->fetchAll(User::class);
-$userById = $dbOperation->fetchOne(User::class, ["id"=>1]); //This can throw 404 if the user is not found
+$userById = $dbOperation->fetchOne(User::class, ["id"=>1]); //This can return null if the user is not found. You can use fetchOneOrThrow to throw 404 instead.
 $usersWithName = $dbOperation->fetchAll(User::class, ["name"=>"dupont","firstname"=>"jean"]);
 
 //Create
