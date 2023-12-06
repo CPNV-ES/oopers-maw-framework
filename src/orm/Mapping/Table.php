@@ -1,6 +1,6 @@
 <?php
 
-namespace ORM;
+namespace ORM\Mapping;
 
 use Attribute;
 
