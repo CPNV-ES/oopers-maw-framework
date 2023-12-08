@@ -184,6 +184,7 @@ class SQLOperations extends DatabaseOperations
         $reflectionProperties = $reflectionClass->getProperties();
         foreach ($reflectionProperties as $reflectionProperty) {
             $columnName = $this->getColumnName($reflectionProperty);
+            if($columnName == null) continue;
             $this->getMethodOfProperty($reflectionClass, $reflectionProperty, false)->invoke(
                 $classInstance,
                 $this->getObjectValueFromSQL(
