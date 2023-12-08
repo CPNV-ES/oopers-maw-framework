@@ -3,6 +3,7 @@
 namespace ORM;
 
 use MVC\Http\Exception\NotFoundException;
+use ORM\Exception\ORMException;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
