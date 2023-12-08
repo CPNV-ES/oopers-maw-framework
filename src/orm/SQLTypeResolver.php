@@ -44,7 +44,7 @@ class SQLTypeResolver extends TypeResolver
         }
         $stringType = $type->getName();
         if ($stringType == "DateTime") {
-            return date("YYYY-MM-DD HH:MI:SS", $object);
+            return $object->format('Y-m-d H:i:s');
         }
         return null;
     }
