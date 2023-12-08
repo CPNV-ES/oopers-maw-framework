@@ -80,11 +80,7 @@ class SQLOperations extends DatabaseOperations
 
         $statement = $this->connection->prepare($query);
         $params = [];
-        foreach ($reflectionProperties as $reflectionProperty) {
-            if ($reflectionProperty->getName() == "id") {
-                continue;
-            }
-            //TODO : Handle if column name is null
+        foreach ($this->filterPropertiesByColumn($reflectionProperties) as $reflectionProperty) {
             $columnName = $this->getColumnName($reflectionProperty);
             $SQLValueFromObject = $this->getSQLValueFromObject(
                 $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
@@ -215,9 +211,7 @@ class SQLOperations extends DatabaseOperations
     {
         $query = "INSERT INTO $tableName (";
 
-        $filteredProperties = array_filter($reflectionProperties, function ($reflectionProperty) {
-            return $reflectionProperty->getName() !== "id" && $this->getColumnName($reflectionProperty) != null;
-        });
+        $filteredProperties = $this->filterPropertiesByColumn($reflectionProperties);
 
         $columnNames = array_map(function ($reflectionProperty) {
             return $this->getColumnName($reflectionProperty);
