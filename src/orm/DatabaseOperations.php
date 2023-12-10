@@ -24,11 +24,13 @@ abstract class DatabaseOperations
      * Fetch array of objects that match the given class type
      * @param $classType - Object or class to fetch
      * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
+     * @param bool $hydrate - If set to true, direct relation with entities will be joints
      * @return array - The array of object of the given types to fetch
      */
     abstract public function fetchAll(
         object|string $classType,
-        array $whereCondition = []
+        array $whereCondition = [],
+        bool $hydrate = false
     ): array;
 
     /**
@@ -37,11 +39,13 @@ abstract class DatabaseOperations
      * @param $classType - Object or class to fetch
      * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
      * @return mixed - The object fetched of the given type (if any)
+     * @param bool $hydrate - If set to true, direct relation with entity will be joints
      * @throws NotFoundException
      */
     public function fetchOneOrThrow(
         object|string $classType,
-        array $whereCondition = []
+        array $whereCondition = [],
+        bool $hydrate = false
     ): object {
         $object = $this->fetchOne($classType, $whereCondition);
         if ($object == null) {
@@ -53,13 +57,15 @@ abstract class DatabaseOperations
     /**
      * Fetch an object of the given class type with the given conditions.
      * Return null if no object found.
-     * @param $classType - Object or class to fetch
+     * @param object|string $classType - Object or class to fetch
      * @param array $whereCondition - The where condition map key(column name) -> value. 'AND' is used if multiple conditions.
-     * @return mixed - The object fetched of the given type (if any)
+     * @param bool $hydrate - If set to true, direct relation with entity will be joints
+     * @return object|null - The object fetched of the given type (if any)
      */
     abstract public function fetchOne(
         object|string $classType,
-        array $whereCondition = []
+        array $whereCondition = [],
+        bool $hydrate = false
     ): object|null;
 
     /**
