@@ -27,10 +27,13 @@ class SQLOperations extends DatabaseOperations
 
     /**
      * Fetch array of objects that match the given class type
+     * @param object|string $classType
+     * @param array $whereCondition
+     * @param bool $hydrate
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function fetchAll(object|string $classType, $whereCondition = []): array
+    public function fetchAll(object|string $classType, $whereCondition = [], bool $hydrate = false): array
     {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
@@ -46,12 +49,16 @@ class SQLOperations extends DatabaseOperations
     /**
      * Fetch an object of the given class type that have a given $id.
      * Return null if no object found.
+     * @param object|string $classType
+     * @param array $whereCondition
+     * @param bool $hydrate
      * @throws ReflectionException
      * @throws ORMException|NotFoundException
      */
     public function fetchOne(
         object|string $classType,
-        $whereCondition = []
+        $whereCondition = [],
+        bool $hydrate = false
     ): object|null {
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
