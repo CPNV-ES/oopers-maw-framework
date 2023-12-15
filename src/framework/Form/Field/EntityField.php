@@ -28,7 +28,8 @@ class EntityField extends TextField
                 [
                     'label' => (string)(new \ReflectionMethod(
                         $entity, 'get' . ucfirst($this->getOption('entity_label'))
-                    ))->invoke($entity)
+                    ))->invoke($entity),
+                    'constraint' => $this->getOption("constraint")
                 ]
             ));
             $this->children[$labelvalue->getId()] = $field->setName(
