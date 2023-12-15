@@ -8,6 +8,20 @@ use ReflectionException;
 class MappedEntity
 {
 
+    private string $entity;
+
+    private Table $table;
+
+    /**
+     * @var array<Column>
+     */
+    private array $columns;
+
+    /**
+     * @var array<BelongsTo|HasMany>
+     */
+    private array $relations;
+
     /**
      * @throws ReflectionException
      * @throws MappingException
