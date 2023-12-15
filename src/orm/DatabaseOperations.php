@@ -141,9 +141,9 @@ abstract class DatabaseOperations
         return $attr->newInstance()->getName();
     }
 
-    protected function filterPropertiesByColumn(array $reflectionProperties){
-        return array_filter($reflectionProperties, function ($reflectionProperty) {
-            return $reflectionProperty->getName() !== "id" && $this->getColumnName($reflectionProperty) != null;
+    protected function filterPropertiesByColumn(array $reflectionProperties, bool $includeId = false){
+        return array_filter($reflectionProperties, function ($reflectionProperty) use ($includeId) {
+            return ($includeId || $reflectionProperty->getName() !== "id") && $this->getColumnName($reflectionProperty) != null;
         });
     }
 }

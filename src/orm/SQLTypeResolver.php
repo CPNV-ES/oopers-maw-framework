@@ -40,7 +40,7 @@ class SQLTypeResolver extends TypeResolver
             return $object;
         }
         if (enum_exists($type)) {
-            return $object->name;
+            return $object->value;
         }
         $stringType = $type->getName();
         if ($stringType == "DateTime") {

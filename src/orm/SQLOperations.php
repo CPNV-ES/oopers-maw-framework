@@ -120,19 +120,19 @@ class SQLOperations extends DatabaseOperations
         $reflectionClass = new ReflectionClass($classType);
         $tableName = $this->getTableNameOfReflectedClass($reflectionClass);
         $query = "UPDATE $tableName SET ";
-        $reflectionProperties = $reflectionClass->getProperties();
+        $filteredReflectionProperties = $this->filterPropertiesByColumn( $reflectionClass->getProperties(), true);
         $mappedColumns = [];
 
-        foreach ($reflectionProperties as $reflectionProperty) {
+        foreach ($filteredReflectionProperties as $reflectionProperty) {
             $columnName = $this->getColumnName($reflectionProperty);
-            if ($columnName === 'id') continue;
+            if($columnName === "id") continue;
             $mappedColumns[] = "$columnName = :$columnName";
         }
         $query .= join(", ", $mappedColumns);
         $query .= " WHERE id = :id";
         $statement = $this->connection->prepare($query);
         $params = [];
-        foreach ($reflectionProperties as $reflectionProperty) {
+        foreach ($filteredReflectionProperties as $reflectionProperty) {
             $SQLValueFromObject = $this->getSQLValueFromObject(
                 $this->getMethodOfProperty($reflectionClass, $reflectionProperty, true)->invoke($instance),
                 $reflectionProperty
