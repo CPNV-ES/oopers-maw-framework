@@ -27,7 +27,7 @@ class QueryBuilderTest extends TestCase
         $q = $this->getQueryBuilder()
             ->from('users', 'u')
             ->select(['id', 'username', 'email'])
-            ->where('u.email = "dimitri.rutz@eduvaud.ch"')
+            ->where("u.email = 'dimitri.rutz@eduvaud.ch'")
         ;
         $this->assertEquals("SELECT u.id, u.username, u.email FROM users u WHERE u.email = 'dimitri.rutz@eduvaud.ch'", $q->toSQL());
     }
