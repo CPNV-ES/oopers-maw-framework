@@ -65,4 +65,10 @@ class QueryBuilder
         return $this;
     }
 
+    public function andWhere(string $condition): self
+    {
+        $this->wheres[] = $condition;
+        return $this;
+    }
+
 }

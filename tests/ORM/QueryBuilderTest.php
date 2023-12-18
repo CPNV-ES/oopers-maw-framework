@@ -38,9 +38,9 @@ class QueryBuilderTest extends TestCase
             ->from('users', 'u')
             ->select(['id', 'username', 'email'])
             ->where("u.email = 'dimitri.rutz@eduvaud.ch'")
-            ->andWhere("u.username LIKE dimitri%")
+            ->andWhere("u.username LIKE 'dimitri%'")
         ;
-        $this->assertEquals("SELECT u.id, u.username, u.email FROM users u WHERE u.email = 'dimitri.rutz@eduvaud.ch'", $q->toSQL());
+        $this->assertEquals("SELECT u.id, u.username, u.email FROM users u WHERE u.email = 'dimitri.rutz@eduvaud.ch' AND u.username LIKE 'dimitri%'", $q->toSQL());
     }
 
 }
