@@ -22,6 +22,24 @@ class MappedEntity
      */
     private array $relations;
 
+    public function __construct(
+        object|string $entity
+    )
+    {
+        $r = new \ReflectionClass($entity);
+        foreach ($r->getProperties() as $property) {
+            $attrs = $property->getAttributes();
+            if (empty($attrs)) continue;
+            foreach ($attrs as $attr) {
+                match ($attr->getName()) {
+                    Column::class => $this->columns[] = ($attr->newInstance())->setProperty($property),
+                    HasMany::class, BelongsTo::class => $this->relations[] = ($attr->newInstance())->setProperty($property)
+                };
+            }
+        }
+        self::getEntityTable($entity);
+    }
+
     /**
      * @throws ReflectionException
      * @throws MappingException
