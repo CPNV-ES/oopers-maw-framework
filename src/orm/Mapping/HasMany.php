@@ -6,7 +6,7 @@ use Attribute;
 use ORM\Exception\MappingException;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class HasMany
+class HasMany extends PropertyMapping
 {
 
     private \ReflectionProperty $targetProperty;

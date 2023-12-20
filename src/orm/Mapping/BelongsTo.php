@@ -6,7 +6,7 @@ use Attribute;
 use ReflectionProperty;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class BelongsTo
+class BelongsTo extends PropertyMapping
 {
 
     public function __construct(
