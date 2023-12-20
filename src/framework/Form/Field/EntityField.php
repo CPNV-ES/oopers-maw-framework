@@ -55,6 +55,14 @@ class EntityField extends TextField
         return $type;
     }
 
+    public function hasError(): bool
+    {
+        foreach ($this->children as $child) {
+            if ($child->hasError()) return true;
+        }
+        return false;
+    }
+
     public function render(): string
     {
         return array_reduce($this->children, function ($curs, $field) {
