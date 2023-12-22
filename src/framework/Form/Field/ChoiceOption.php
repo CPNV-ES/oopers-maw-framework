@@ -19,7 +19,12 @@ class ChoiceOption
 
 	public function defineAsSelected($value): self
 	{
-		$this->selected = $this->value == $value;
+        if (is_object($value) && enum_exists(get_class($value))) {
+            $this->selected = $this->value == $value->value;
+        } else {
+            $this->selected = $this->value == $value;
+        }
+
 		return $this;
 	}
 }
