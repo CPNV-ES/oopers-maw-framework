@@ -1,6 +1,6 @@
 <?php
 
-namespace ORM\EntitiesTraits;
+namespace ORM\EntitiyTrait;
 
 use ORM\DatabaseOperations;
 
