@@ -6,7 +6,7 @@ use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Kernel;
 use ORM\DatabaseOperations;
-use ORM\Table;
+use ORM\Mapping\Table;
 
 /**
  * Interpret Controller action parameters to bind request parameters in called method
