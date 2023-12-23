@@ -1,6 +1,6 @@
 <?php
 
-namespace ORM\EntitiyTrait;
+namespace ORM\EntityTrait;
 
 use MVC\Http\Exception\NotFoundException;
 use ORM\DatabaseOperations;
