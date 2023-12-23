@@ -1,11 +1,7 @@
 /vendor/
 /.idea/
 /.php-cs-fixer.cache
-/app/
-/config/
-/public/
 .env
 /views/
 /.phpdoc/
-/doc/internal/
 *.cache
