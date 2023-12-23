@@ -20,20 +20,19 @@ In your controllers, you can by using `Controller::render()` method render a vie
 
 ```php
 // src/Controller/UserController.php
-public function index(UserRepository $repository): Response
+public function index(\ORM\DatabaseOperations $operations): Response
 {
-    $users = $repository->findAll();
     return $this->render('user.index', [
-        'users' => $users
+        'users' => User::getAll($operations)
     ])
 }
 ```
 
 ```php
 // src/Controller/UserController.php
-public function index(UserRepository $repository): Response
+public function index(\ORM\DatabaseOperations $operations): Response
 {
-    $users = $repository->findAll();
+    $users = User::getAll($operations);
     $body = new View('user.index', ['users', $users]);
     $layout = (new View('user.index'))->add('body', $body);
     return new Response($layout);
