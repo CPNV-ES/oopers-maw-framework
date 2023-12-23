@@ -42,7 +42,7 @@ public function index(UserRepository $repository): Response
 
 ### In Views
 
-Start by creating an `base.php` or whatever you like ([Controller Component (WIP)](Controller.md)) file in your `./views` folder.
+Start by creating an `base.php` or whatever you like ([Routing Component](Routing.md)) file in your `./views` folder.
 
 In this file create your HTML structure for your pages. To use the autocompletion of your IDE at the start of your file open an PHP tag create new comment to tell him `$this` var is an `View` object.
 
