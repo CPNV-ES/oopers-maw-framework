@@ -1,8 +1,9 @@
 <?php
 
-namespace ORM;
+namespace ORM\Driver\MySQL;
 
 use MVC\Http\Exception\NotFoundException;
+use ORM\DatabaseOperations;
 use ORM\Exception\ORMException;
 use PDO;
 use ReflectionClass;

@@ -3,7 +3,7 @@
 namespace MVC\Service;
 
 use MVC\Container;
-use ORM\SQLOperations;
+use ORM\Driver\MySQL\SQLOperations;
 use PDO;
 
 class ContainerService
@@ -11,7 +11,7 @@ class ContainerService
 
     public static function containerInit(Container $container): Container
     {
-        $container->set('ORM\SQLOperations', function () {
+        $container->set('ORM\Driver\MySQL\SQLOperations', function () {
             $parsed = explode('://', $_ENV['DATABASE_URL'])[1];
             $pattern = '`(?<user>[A-z-0-9-]+):(?<password>.+)@(?<host>([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}):?([0-9]{1,5}))/(?<db_name>[A-z-0-9-]+)`';
             preg_match_all($pattern, $parsed, $matches);
