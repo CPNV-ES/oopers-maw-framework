@@ -1,11 +1,23 @@
 {
     "name": "oopers/maw-framework",
     "type": "library",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "autoload": {
         "psr-4": {
-            "MVC\\": "src/"
+            "MVC\\": "src/framework/",
+            "ORM\\": "src/orm/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "doctrine/collections": "^2.1",
+        "symfony/dotenv": "^6.3",
+        "ext-pdo": "*"
     },
     "authors": [
         {
@@ -17,5 +29,9 @@
             "email": "eliott.jaquier@eduvaud.ch"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.26",
+        "phpunit/phpunit": "^10",
+        "symfony/var-dumper": "^6.3"
+    }
 }
