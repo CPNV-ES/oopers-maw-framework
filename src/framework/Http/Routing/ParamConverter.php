@@ -5,6 +5,7 @@ namespace MVC\Http\Routing;
 use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Kernel;
+use ORM\Table;
 
 /**
  * Interpret Controller action parameters to bind request parameters in called method
@@ -34,6 +35,26 @@ class ParamConverter
 		$methodParams = $this->reflectionMethod->getParameters();
 		return array_reduce($methodParams, function ($past, $item) use ($request) {
 			/** @var \ReflectionParameter $item */
+
+
+            $attrs = [];
+            if ($item->getType() instanceof \ReflectionUnionType) {
+                foreach ($item->getType()->getTypes() as $type) {
+                    if (!class_exists($type->getName())) continue;
+                    $paramType = $type->getName();
+                    $attrs = (new \ReflectionClass($type->getName()))->getAttributes(Table::class);
+                }
+            } else {
+                if (class_exists($item->getType()->getName())) {
+                    $attrs = (new \ReflectionClass($item->getType()->getName()))->getAttributes(Table::class);
+                    $paramType = $item->getType()->getName();
+                }
+            }
+
+            if (count($attrs) === 1) {
+
+            }
+
 			if ($request->params->containsKey($item->getName())) {
 				$past[$item->getName()] = $request->params->get($item->getName())->value;
 			} else {
