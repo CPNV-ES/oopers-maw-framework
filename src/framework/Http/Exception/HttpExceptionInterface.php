@@ -7,6 +7,6 @@ use MVC\Http\Response\Response;
 interface HttpExceptionInterface
 {
 
-	public function getResponse(): Response;
+    public function getResponse(): Response;
 
 }

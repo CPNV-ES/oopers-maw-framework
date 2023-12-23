@@ -10,45 +10,50 @@ use MVC\Kernel;
  */
 class ClassFinder
 {
-	public static function getClassesInNamespace($namespace): array
-	{
-		$files = scandir(self::getNamespaceDirectory($namespace));
+    public static function getClassesInNamespace($namespace): array
+    {
+        $files = scandir(self::getNamespaceDirectory($namespace));
 
-		$classes = array_map(function($file) use ($namespace){
-			return $namespace . '\\' . str_replace('.php', '', $file);
-		}, $files);
+        $classes = array_map(function ($file) use ($namespace) {
+            return $namespace . '\\' . str_replace('.php', '', $file);
+        }, $files);
 
 
-		return array_filter($classes, function($possibleClass){
-			return class_exists($possibleClass);
-		});
-	}
+        return array_filter($classes, function ($possibleClass) {
+            return class_exists($possibleClass);
+        });
+    }
 
-	private static function getDefinedNamespaces(): array
-	{
-		$composerJsonPath = Kernel::projectDir() . '/composer.json';
-		$composerConfig = json_decode(file_get_contents($composerJsonPath));
+    private static function getNamespaceDirectory($namespace): false|string
+    {
+        $composerNamespaces = self::getDefinedNamespaces();
 
-		return (array)$composerConfig->autoload->{'psr-4'};
-	}
+        $namespaceFragments = explode('\\', $namespace);
+        $undefinedNamespaceFragments = [];
 
-	private static function getNamespaceDirectory($namespace): false|string
-	{
-		$composerNamespaces = self::getDefinedNamespaces();
+        while ($namespaceFragments) {
+            $possibleNamespace = implode('\\', $namespaceFragments) . '\\';
 
-		$namespaceFragments = explode('\\', $namespace);
-		$undefinedNamespaceFragments = [];
+            if (array_key_exists($possibleNamespace, $composerNamespaces)) {
+                return realpath(
+                    Kernel::projectDir() . '/' . $composerNamespaces[$possibleNamespace] . implode(
+                        '/',
+                        $undefinedNamespaceFragments
+                    )
+                );
+            }
 
-		while($namespaceFragments) {
-			$possibleNamespace = implode('\\', $namespaceFragments) . '\\';
+            array_unshift($undefinedNamespaceFragments, array_pop($namespaceFragments));
+        }
 
-			if(array_key_exists($possibleNamespace, $composerNamespaces)){
-				return realpath(Kernel::projectDir() . '/' . $composerNamespaces[$possibleNamespace] . implode('/', $undefinedNamespaceFragments));
-			}
+        return false;
+    }
 
-			array_unshift($undefinedNamespaceFragments, array_pop($namespaceFragments));
-		}
+    private static function getDefinedNamespaces(): array
+    {
+        $composerJsonPath = Kernel::projectDir() . '/composer.json';
+        $composerConfig = json_decode(file_get_contents($composerJsonPath));
 
-		return false;
-	}
+        return (array)$composerConfig->autoload->{'psr-4'};
+    }
 }

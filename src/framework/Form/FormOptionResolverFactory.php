@@ -8,24 +8,22 @@ class FormOptionResolverFactory
 {
 
 
-	public static function create(): OptionsResolver
-	{
-		return (new OptionsResolver())
-			->setAllowed([
-				'view_template',
-				'action_route',
-				'attributes',
-				'method',
-			])
-			->setRequired([
-				'method',
-			])
-			->setDefaults([
-				'method' => 'POST',
-				'attributes' => []
-			])
-		;
-		
-	}
+    public static function create(): OptionsResolver
+    {
+        return (new OptionsResolver())
+            ->setAllowed([
+                'view_template',
+                'action_route',
+                'attributes',
+                'method',
+            ])
+            ->setRequired([
+                'method',
+            ])
+            ->setDefaults([
+                'method' => 'POST',
+                'attributes' => []
+            ]);
+    }
 
 }

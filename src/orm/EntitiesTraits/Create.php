@@ -1,4 +1,5 @@
 <?php
+
 namespace ORM\EntitiesTraits;
 
 use ORM\DatabaseOperations;

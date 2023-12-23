@@ -1,8 +1,7 @@
 <?php
 
-use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
-use MVC\Http\Routing\Router;
+use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Kernel;
 
 /**
@@ -15,5 +14,5 @@ use MVC\Kernel;
  */
 function generateUrl(string $routeName, ?array $params = null): string
 {
-	return Kernel::url($routeName, $params);
+    return Kernel::url($routeName, $params);
 }

@@ -2,6 +2,8 @@
 
 namespace MVC\Exception;
 
-class AutoWiringException extends \Exception
+use Exception;
+
+class AutoWiringException extends Exception
 {
 }

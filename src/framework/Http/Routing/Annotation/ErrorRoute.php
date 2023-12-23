@@ -3,7 +3,6 @@
 namespace MVC\Http\Routing\Annotation;
 
 use Attribute;
-use MVC\Http\HTTPMethod;
 use MVC\Http\HTTPStatus;
 
 /**
@@ -13,10 +12,9 @@ use MVC\Http\HTTPStatus;
 class ErrorRoute
 {
 
-	public function __construct(
-		public HTTPStatus $status,
-	)
-	{
-	}
+    public function __construct(
+        public HTTPStatus $status,
+    ) {
+    }
 
 }
