@@ -2,14 +2,14 @@
 
 namespace MVC\Http\Exception;
 
-use MVC\Http\HTTPStatus;
+use Exception;
 
 /**
  * @const HTTPStatus STATUS
  */
-abstract class HttpException extends \Exception implements HttpExceptionInterface
+abstract class HttpException extends Exception implements HttpExceptionInterface
 {
 
-	const STATUS = null;
+    public const STATUS = null;
 
 }

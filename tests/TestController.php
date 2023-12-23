@@ -1,8 +1,8 @@
 <?php
 namespace Tests;
 
-use MVC\Http\Controller\Controller;
-use MVC\Http\Response\Response;
+use MVC\Http\Controller;
+use MVC\Http\Response;
 
 class TestController extends Controller{
     public function notValidMethod(){

@@ -2,10 +2,13 @@
 
 namespace MVC\Form\Field;
 
+use ReflectionMethod;
+use ReflectionProperty;
+
 class EntityField extends TextField
 {
 
-    public function __construct(string $id, mixed $value, \ReflectionProperty $property, object $entity)
+    public function __construct(string $id, mixed $value, ReflectionProperty $property, object $entity)
     {
         parent::__construct($id, $value, $property, $entity);
     }
@@ -17,7 +20,7 @@ class EntityField extends TextField
             $entities = [$entities];
         }
         foreach ($entities as $entity) {
-            $labelvalue = (new \ReflectionMethod($entity, 'get' . ucfirst($this->getOption('entity_label'))))->invoke(
+            $labelvalue = (new ReflectionMethod($entity, 'get' . ucfirst($this->getOption('entity_label'))))->invoke(
                 $entity
             );
             $fieldType = $this->resolveFieldType($entity);
@@ -26,14 +29,14 @@ class EntityField extends TextField
                 $fieldType,
                 $entity,
                 [
-                    'label' => (string)(new \ReflectionMethod(
+                    'label' => (string)(new ReflectionMethod(
                         $entity, 'get' . ucfirst($this->getOption('entity_label'))
                     ))->invoke($entity),
                     'constraint' => $this->getOption("constraint")
                 ]
             ));
             $this->children[$labelvalue->getId()] = $field->setName(
-                $this->getProperty()->getName() . "[" . (new \ReflectionMethod(
+                $this->getProperty()->getName() . "[" . (new ReflectionMethod(
                     $entity,
                     'get' . ucfirst($this->getOption('entity_label'))
                 ))->invoke($entity)->getId() . "]"
@@ -58,7 +61,9 @@ class EntityField extends TextField
     public function hasError(): bool
     {
         foreach ($this->children as $child) {
-            if ($child->hasError()) return true;
+            if ($child->hasError()) {
+                return true;
+            }
         }
         return false;
     }

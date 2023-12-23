@@ -1,7 +1,7 @@
 <?php
-namespace ORM\EntitiesTraits;
 
-use MVC\Http\Exception\NotFoundException;
+namespace ORM\EntityTrait;
+
 use ORM\DatabaseOperations;
 
 /**
@@ -16,7 +16,7 @@ trait Delete
      */
     public static function deleteById(DatabaseOperations $operations, int $id): void
     {
-        $operations->delete(self::class,$id);
+        $operations->delete(self::class, $id);
     }
 
     /**
@@ -25,7 +25,7 @@ trait Delete
      */
     public function delete(DatabaseOperations $operations): void
     {
-        $operations->delete($this,$this->getId());
+        $operations->delete($this, $this->getId());
     }
 
     /**

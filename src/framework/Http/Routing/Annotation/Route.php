@@ -12,32 +12,30 @@ use MVC\Http\HTTPMethod;
 class Route
 {
 
-	private array $methods = [];
+    private array $methods = [];
 
-	public function __construct(
-		public string $path,
-		public ?string $name = null,
-		array|string $methods = 'GET'
-	)
-	{
-		$this->setMethods($methods);
-	}
+    public function __construct(
+        public string $path,
+        public ?string $name = null,
+        array|string $methods = 'GET'
+    ) {
+        $this->setMethods($methods);
+    }
 
-	private function setMethods(string|array $methods): void
-	{
-		if (is_string($methods)) {
-			$this->methods[] = HTTPMethod::from($methods);
-			return;
-		}
-		$this->methods = array_map(fn($item) => $item instanceof HTTPMethod ? $item : HTTPMethod::from($item), $methods);
-	}
+    private function setMethods(string|array $methods): void
+    {
+        if (is_string($methods)) {
+            $this->methods[] = HTTPMethod::from($methods);
+            return;
+        }
+        $this->methods = array_map(fn($item) => $item instanceof HTTPMethod ? $item : HTTPMethod::from($item),
+            $methods);
+    }
 
-	public function getMethods(): array
-	{
-		return $this->methods;
-	}
-
-
+    public function getMethods(): array
+    {
+        return $this->methods;
+    }
 
 
 }

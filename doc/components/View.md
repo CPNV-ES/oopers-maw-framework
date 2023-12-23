@@ -20,20 +20,19 @@ In your controllers, you can by using `Controller::render()` method render a vie
 
 ```php
 // src/Controller/UserController.php
-public function index(UserRepository $repository): Response
+public function index(\ORM\DatabaseOperations $operations): Response
 {
-    $users = $repository->findAll();
     return $this->render('user.index', [
-        'users' => $users
+        'users' => User::getAll($operations)
     ])
 }
 ```
 
 ```php
 // src/Controller/UserController.php
-public function index(UserRepository $repository): Response
+public function index(\ORM\DatabaseOperations $operations): Response
 {
-    $users = $repository->findAll();
+    $users = User::getAll($operations);
     $body = new View('user.index', ['users', $users]);
     $layout = (new View('user.index'))->add('body', $body);
     return new Response($layout);
@@ -42,7 +41,7 @@ public function index(UserRepository $repository): Response
 
 ### In Views
 
-Start by creating an `base.php` or whatever you like ([Controller Component (WIP)](Controller.md)) file in your `./views` folder.
+Start by creating an `base.php` or whatever you like ([Routing Component](Routing.md)) file in your `./views` folder.
 
 In this file create your HTML structure for your pages. To use the autocompletion of your IDE at the start of your file open an PHP tag create new comment to tell him `$this` var is an `View` object.
 

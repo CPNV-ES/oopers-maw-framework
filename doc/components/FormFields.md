@@ -18,10 +18,11 @@ ___
 
 All field of any types have these options.
 
-| Key          | Type          | Default  | Description                                                                                                   |
-|--------------|:--------------|----------|---------------------------------------------------------------------------------------------------------------|
-| `label`      | string\|array | Required | Label displayed before field in HTML view                                                                     |
-| `attributes` | array         | `[name]` | List of HTML attributes that will be inserted in HTML tag of input (e.g. `<select>`, `<input>`, `<textarea>`) |
+| Key           | Type          | Default  | Description                                                                                                                                                                                  |
+|---------------|:--------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `label`       | string\|array | Required | Label displayed before field in HTML view                                                                                                                                                    |
+| `attributes`  | array         | `[name]` | List of HTML attributes that will be inserted in HTML tag of input (e.g. `<select>`, `<input>`, `<textarea>`)                                                                                |
+| `constraints` | Closure       | null     | Callable that will validate value in form. Signature `($value): array` return an array and if is there an error a key `message` have to contains a message that will be rendered to the view |
 
 
 ## Text

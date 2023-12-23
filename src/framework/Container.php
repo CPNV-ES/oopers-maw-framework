@@ -3,6 +3,7 @@
 namespace MVC;
 
 use MVC\Exception\AutoWiringException;
+use ReflectionClass;
 
 class Container
 {
@@ -46,7 +47,6 @@ class Container
 
     public function get(string $key): object
     {
-
         if (isset($this->instances[$key])) {
             return $this->instances[$key];
         }
@@ -59,30 +59,43 @@ class Container
             return $this->getRegistry($key);
         }
 
-		foreach ($this->instances as $k => $item) {
-			if (is_subclass_of($k, $key)) {
-				$this->instances[$key] = $item;
-				return $item;
-			}
-		}
+        foreach ($this->instances as $k => $item) {
+            if (is_subclass_of($k, $key)) {
+                $this->instances[$key] = $item;
+                return $item;
+            }
+        }
 
-		foreach ($this->registry as $k => $item) {
-			if (is_subclass_of($k, $key)) {
-				$instance = $this->getRegistry($k);
-				$this->instances[$key] = $instance;
-				return $instance;
-			}
-		}
+        foreach ($this->registry as $k => $item) {
+            if (is_subclass_of($k, $key)) {
+                $instance = $this->getRegistry($k);
+                $this->instances[$key] = $instance;
+                return $instance;
+            }
+        }
 
         return $this->autoWire($key);
     }
 
+    private function getRegistry(string $key): object
+    {
+        $instance = $this->registry[$key]();
+        if (!isset($this->instances[$key])) {
+            $this->instances[$key] = $instance;
+        }
+        return $instance;
+    }
+
     private function autoWire(string $key): object
     {
-        if (!class_exists($key)) throw new AutoWiringException("Unable to auto wire `$key` class doesn't exist.");
+        if (!class_exists($key)) {
+            throw new AutoWiringException("Unable to auto wire `$key` class doesn't exist.");
+        }
 
-        $reflection = new \ReflectionClass($key);
-        if (!$reflection->isInstantiable()) throw new AutoWiringException("Unable to auto wire `$key` due non instantiable class.");
+        $reflection = new ReflectionClass($key);
+        if (!$reflection->isInstantiable()) {
+            throw new AutoWiringException("Unable to auto wire `$key` due non instantiable class.");
+        }
 
         $ctr_args = [];
         if ($reflection->getConstructor()) {
@@ -100,21 +113,12 @@ class Container
                     $class_name = $param->getDeclaringClass()->getName();
                     throw new AutoWiringException("Unable to auto wire `$param_name` in `$class_name` __constructor.");
                 }
-
             }
-
         }
 
         $instance = $reflection->newInstanceArgs($ctr_args);
 
         return $this->instances[$key] = $instance;
     }
-
-	private function getRegistry(string $key): object
-	{
-		$instance = $this->registry[$key]();
-		if (!isset($this->instances[$key])) $this->instances[$key] = $instance;
-		return $instance;
-	}
 
 }

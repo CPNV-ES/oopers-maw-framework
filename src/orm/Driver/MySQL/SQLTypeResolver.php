@@ -1,8 +1,9 @@
 <?php
 
-namespace ORM;
+namespace ORM\Driver\MySQL;
 
 use DateTime;
+use ORM\TypeResolver;
 use ReflectionNamedType;
 
 class SQLTypeResolver extends TypeResolver

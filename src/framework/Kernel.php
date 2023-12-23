@@ -5,13 +5,14 @@ namespace MVC;
 use MVC\Filesystem\ClassFinder;
 use MVC\Http\Exception\HttpException;
 use MVC\Http\Exception\InternalServerErrorException;
-use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Http\Routing\Route;
 use MVC\Http\Routing\Router;
 use MVC\Service\ContainerService;
+use ReflectionException;
 use Symfony\Component\Dotenv\Dotenv;
+use Throwable;
 
 /**
  * The kernel is the application's entry point. Kernel initialization defines the application's basic tools. Its role is to read environment variables using the [symfony/dotenv](https://symfony.com/components/Dotenv).
@@ -82,14 +83,16 @@ class Kernel
         return self::$_instance;
     }
 
-	public static function container(): Container
-	{
-		return self::getInstance()->container;
-	}
+    public static function container(): Container
+    {
+        return self::getInstance()->container;
+    }
 
     public static function kernelVarsToString(string $string): string
     {
-        return str_replace(['%kernel.project_dir%', '%kernel.framework_dir%'], [self::projectDir(), self::frameworkDir()], $string);
+        return str_replace(['%kernel.project_dir%', '%kernel.framework_dir%'],
+            [self::projectDir(), self::frameworkDir()],
+            $string);
     }
 
     public static function projectDir(): string
@@ -114,7 +117,7 @@ class Kernel
             $response->execute();
         } catch (HttpException $exception) {
             $exception->getResponse()->execute();
-        } catch (\Throwable $error) {
+        } catch (Throwable $error) {
             if ($_ENV['APP_ENV'] === 'DEV') {
                 dd($error);
             }
@@ -123,7 +126,7 @@ class Kernel
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function listen(): void
     {
@@ -132,7 +135,7 @@ class Kernel
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function registerErrors(): self
     {

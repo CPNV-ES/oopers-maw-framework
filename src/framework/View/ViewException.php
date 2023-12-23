@@ -2,7 +2,9 @@
 
 namespace MVC\View;
 
-class ViewException extends \Exception
+use Exception;
+
+class ViewException extends Exception
 {
 
 }
