@@ -93,5 +93,5 @@ public function new(): Response
 
 ## Future features
 
-- Add support of CSRF token
-- Make EntityField able to determine the field type it self
+- [ ] Add support of CSRF token
+- [x] Make EntityField able to determine the field type it self
