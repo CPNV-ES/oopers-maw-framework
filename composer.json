@@ -1,7 +1,7 @@
 {
     "name": "oopers/maw-framework",
     "type": "library",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "autoload": {
         "psr-4": {
             "MVC\\": "src/framework/",
