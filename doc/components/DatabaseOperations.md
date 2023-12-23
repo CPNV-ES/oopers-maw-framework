@@ -50,19 +50,35 @@ In a model, you can use the DBORM with a PDO connected to your database to make 
 //$dbOperation = new SQLOperations($pdoConnection);
 //Fetch
 $allUsers = $dbOperation->fetchAll(User::class);
-$userById = $dbOperation->fetchOne(User::class, ["id"=>1]); //This can return null if the user is not found. You can use fetchOneOrThrow to throw 404 instead.
-$usersWithName = $dbOperation->fetchAll(User::class, ["name"=>"dupont","firstname"=>"jean"]);
+// OR 
+$allUsers = User::getAll($dbOperation);
+
+$userById = $dbOperation->fetchOne(User::class, ["id" => 1]); //This can return null if the user is not found. You can use fetchOneOrThrow to throw 404 instead.
+// OR
+$userById = User::getOne($dbOperation, ["id" => 1]); //This can return null if the user is not found. You can use fetchOneOrThrow to throw 404 instead.
+
+$usersWithName = $dbOperation->fetchAll(User::class, ["name" => "dupont", "firstname" => "jean"]);
+// OR
+$usersWithName = User::getAll($dbOperation, ["name" => "dupont", "firstname" => "jean"]);
 
 //Create
 $newUser = new User("Mike");
 $newUser->id = $dbOperation->create($newUser);
+/ /OR 
+$newUser->id = $newUser->create($dbOperation);
 
 //Update
 $newUser->firstName = "Miky";
 $dbOperation->update($newUser);
+// OR
+$newUser->update($dbOperation)
 
 //Delete
 $dbOperation->delete($newUser);
-//OR (if the full reference isn't available)
-$dbOperation->delete(User::class,$newUser->id);
+// OR (if the full reference isn't available)
+$dbOperation->delete(User::class, $newUser->id);
+// OR
+$user->delete($dbOperation)
+// OR
+User::deleteById($dbOperation, 5)
 ```
