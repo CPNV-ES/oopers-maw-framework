@@ -2,6 +2,7 @@
 
 namespace ORM;
 
+use ORM\Exception\ORMException;
 use ReflectionNamedType;
 
 abstract class TypeResolver

@@ -3,6 +3,7 @@
 namespace ORM;
 
 use MVC\Http\Exception\NotFoundException;
+use ORM\Exception\ORMException;
 use ORM\Mapping\Column;
 use ORM\Mapping\Table;
 use ReflectionClass;
