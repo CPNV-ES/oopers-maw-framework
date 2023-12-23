@@ -2,7 +2,7 @@
 
 namespace MVC\Http\Routing;
 
-use MVC\Http\Controller\Controller;
+use MVC\Http\Controller;
 use ReflectionClass;
 use ReflectionException;
 

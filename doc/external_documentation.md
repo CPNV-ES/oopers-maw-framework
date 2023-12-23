@@ -62,12 +62,12 @@ You can define routes by adding annotations inside your controllers.
 To define a route, you can add a Route annotation to any methods on a Controller that inherit Controller.
 
 You can add a '[:name]' to capture a part of the url as a parameter for the method.
+
 ```php
 <?php
 namespace App\Controller;
 
-use MVC\Http\Controller\Controller;
-use MVC\Http\Routing\Annotation\Route;
+use MVC\Http\Controller;use MVC\Http\Routing\Annotation\Route;
 
 class HomeController extends Controller
 {
@@ -91,12 +91,9 @@ You can define your custom response for any HTTP Errors that are thrown by using
 <?php
 namespace App\Controller;
 
-use MVC\Http\Controller\Controller;
-use MVC\Http\HTTPStatus;
-use MVC\Http\Routing\Annotation\ErrorRoute;
-use MVC\Http\Response\Response;
+use MVC\Http\HTTPStatus;use MVC\Http\Response\Response;use MVC\Http\Routing\Annotation\ErrorRoute;
 
-class ErrorController extends Controller
+class ErrorController extends \MVC\Http\Controller
 {
     #[ErrorRoute(HTTPStatus::NOT_FOUND)]
     public function notFound()

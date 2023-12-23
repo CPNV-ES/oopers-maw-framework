@@ -1,7 +1,7 @@
 <?php
 namespace Tests;
 
-use MVC\Http\Controller\Controller;
+use MVC\Http\Controller;
 use MVC\Http\Response\Response;
 
 class TestController extends Controller{

@@ -3,7 +3,7 @@
 namespace MVC\Http\Routing;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use MVC\Http\Controller\Controller;
+use MVC\Http\Controller;
 use MVC\Http\Exception\HttpException;
 use MVC\Http\Exception\MethodNotAllowedException;
 use MVC\Http\Exception\NotFoundException;
@@ -221,7 +221,7 @@ class Router
         $paramConverter = new ParamConverter($route);
         $params = $paramConverter->getParams($this->currentRequest);
 
-        /** @var Controller $controller */
+        /** @var \MVC\Http\Controller $controller */
         $controller = new $controllerName($this->currentRequest);
 
         return $controller->$controllerMethod(...$params);

@@ -1,9 +1,7 @@
 <?php
 
-namespace MVC\Http\Controller;
+namespace MVC\Http;
 
-use MVC\Http\HTTPStatus;
-use MVC\Http\Request;
 use MVC\Http\Response\Response;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
