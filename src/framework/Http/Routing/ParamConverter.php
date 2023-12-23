@@ -5,6 +5,7 @@ namespace MVC\Http\Routing;
 use MVC\Http\HTTPStatus;
 use MVC\Http\Request;
 use MVC\Kernel;
+use ORM\DatabaseOperations;
 use ORM\Table;
 
 /**
@@ -33,31 +34,44 @@ class ParamConverter
 	public function getParams(Request $request): array
 	{
 		$methodParams = $this->reflectionMethod->getParameters();
-		return array_reduce($methodParams, function ($past, $item) use ($request) {
+		$params = $request->params;
+
+		return array_reduce($methodParams, function ($past, $item) use ($params) {
 			/** @var \ReflectionParameter $item */
-
-
-            $attrs = [];
+			$table = null;
             if ($item->getType() instanceof \ReflectionUnionType) {
                 foreach ($item->getType()->getTypes() as $type) {
                     if (!class_exists($type->getName())) continue;
-                    $paramType = $type->getName();
-                    $attrs = (new \ReflectionClass($type->getName()))->getAttributes(Table::class);
+                    $entity = $type->getName();
+					$table = (new \ReflectionClass($type->getName()))->getAttributes(Table::class)[0] ?? null;
                 }
-            } else {
-                if (class_exists($item->getType()->getName())) {
-                    $attrs = (new \ReflectionClass($item->getType()->getName()))->getAttributes(Table::class);
-                    $paramType = $item->getType()->getName();
-                }
+            } elseif (class_exists($item->getType()->getName())){
+				$table = (new \ReflectionClass($item->getType()->getName()))->getAttributes(Table::class)[0] ?? null;
+				$entity = $item->getType()->getName();
             }
 
-            if (count($attrs) === 1) {
+            if ($table) {
+				$validParamsNames = [];
+				$parts = explode('\\', $entity);
+				$entity_name = $parts[array_key_last($parts)];
+				$validParamsNames[] = strtolower($entity_name[0] . "_id");
+				$validParamsNames[] = strtolower($entity_name . "_id");
+				$validParamsNames[] = 'id';
+				$validParamsNames[] = strtolower($entity_name[0]) . "Id";
+				$validParamsNames[] = strtolower($entity_name) . "Id";
+				$validParamsNames[] = strtolower($entity_name);
 
+				foreach ($validParamsNames as $name) {
+					if ($params->get($name)) {
+						$past[$item->getName()] = Kernel::container()->get(DatabaseOperations::class)->fetchOneOrThrow($entity, ['id' => $params->get($name)->value]);
+						$params->removeElement($params->get($name));
+					}
+				}
             }
 
-			if ($request->params->containsKey($item->getName())) {
-				$past[$item->getName()] = $request->params->get($item->getName())->value;
-			} else {
+			if ($params->containsKey($item->getName())) {
+				$past[$item->getName()] = $params->get($item->getName())->value;
+			} elseif (!isset($past[$item->getName()])) {
 				$past[$item->getName()] = match ($item->getType()->getName()) {
 					HTTPStatus::class => $this->convertStatus($item->getName()),
 					default => Kernel::getInstance()->container->get($item->getType()->getName())
