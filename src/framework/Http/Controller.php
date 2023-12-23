@@ -2,7 +2,6 @@
 
 namespace MVC\Http;
 
-use MVC\Http\Response\Response;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Kernel;

@@ -91,7 +91,7 @@ You can define your custom response for any HTTP Errors that are thrown by using
 <?php
 namespace App\Controller;
 
-use MVC\Http\HTTPStatus;use MVC\Http\Response\Response;use MVC\Http\Routing\Annotation\ErrorRoute;
+use MVC\Http\HTTPStatus;use MVC\Http\Response;use MVC\Http\Routing\Annotation\ErrorRoute;
 
 class ErrorController extends \MVC\Http\Controller
 {

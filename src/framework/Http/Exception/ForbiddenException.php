@@ -3,7 +3,7 @@
 namespace MVC\Http\Exception;
 
 use MVC\Http\HTTPStatus;
-use MVC\Http\Response\Response;
+use MVC\Http\Response;
 
 class ForbiddenException extends HttpException
 {

@@ -1,10 +1,9 @@
 <?php
 
-namespace MVC\Http\Response;
+namespace MVC\Http;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use MVC\Http\HTTPStatus;
 
 /**
  * Represent response with can be build from scratch and executed without any other requirements

@@ -9,7 +9,7 @@ use MVC\Http\Exception\MethodNotAllowedException;
 use MVC\Http\Exception\NotFoundException;
 use MVC\Http\HTTPMethod;
 use MVC\Http\Request;
-use MVC\Http\Response\Response;
+use MVC\Http\Response;
 use MVC\Http\Routing\Annotation as Annotation;
 use MVC\Http\Routing\Exception\BadRouteDeclarationException;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
