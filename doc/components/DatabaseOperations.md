@@ -65,7 +65,7 @@ $usersWithName = User::getAll($dbOperation, ["name" => "dupont", "firstname" => 
 $newUser = new User("Mike");
 $newUser->id = $dbOperation->create($newUser);
 / /OR 
-$newUser->id = $newUser->create($dbOperation);
+$newUser->create($dbOperation);
 
 //Update
 $newUser->firstName = "Miky";
