@@ -82,6 +82,11 @@ class Kernel
         return self::$_instance;
     }
 
+	public static function container(): Container
+	{
+		return self::getInstance()->container;
+	}
+
     public static function kernelVarsToString(string $string): string
     {
         return str_replace(['%kernel.project_dir%', '%kernel.framework_dir%'], [self::projectDir(), self::frameworkDir()], $string);
