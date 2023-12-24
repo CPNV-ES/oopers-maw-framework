@@ -2,6 +2,7 @@
 
 namespace MVC\Http;
 
+use MVC\Form\AbstractForm;
 use MVC\Http\Routing\Exception\MissingRouteParamsException;
 use MVC\Http\Routing\Exception\NotFoundRouteException;
 use MVC\Kernel;
@@ -66,6 +67,14 @@ abstract class Controller
     protected function render(string $view, array $content = [], HTTPStatus $status = HTTPStatus::OK): Response
     {
         return new Response($this->renderView($view, $content), $status);
+    }
+
+    protected function createForm(string $form, object $data): AbstractForm
+    {
+        $form = Kernel::container()->get($form);
+        $form->setEntity($data);
+        $form->buildForm();
+        return $form;
     }
 
     /**

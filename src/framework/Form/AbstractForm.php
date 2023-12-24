@@ -6,6 +6,7 @@ use MVC\Form\Field\AbstractField;
 use MVC\Http\HTTPMethod;
 use MVC\Http\Request;
 use MVC\OptionsResolver;
+use MVC\Security\CsrfManager;
 
 abstract class AbstractForm
 {
@@ -18,16 +19,21 @@ abstract class AbstractForm
     private OptionsResolver $options;
     private ?Request $request = null;
 
-    public function __construct(object $entity)
+    public function __construct(protected CsrfManager $csrfManager)
     {
-        $this->entity = $entity;
-        $this->setEntityName(get_class($entity));
         $this->options = FormOptionResolverFactory::create();
     }
 
     public function setEntityName(string $entity_name): AbstractForm
     {
         $this->entity_name = $entity_name;
+        return $this;
+    }
+
+    public function setEntity(object $entity): self
+    {
+        $this->entity = $entity;
+        $this->setEntityName(get_class($entity));
         return $this;
     }
 
