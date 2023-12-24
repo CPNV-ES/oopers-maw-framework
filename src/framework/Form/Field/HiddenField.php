@@ -10,6 +10,6 @@ class HiddenField extends AbstractField
     {
         parent::__construct($id, $value, $property, $entity);
         $this->setOption('attributes', ['type' => "hidden"]);
-        $this->setOption('view_template', 'form.text-field');
+        $this->setOption('view_template', 'form.hidden-field');
     }
 }
