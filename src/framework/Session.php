@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Session extends ArrayCollection
 {
 
+    private bool $started = false;
+
     public function __construct()
     {
         $this->start();
@@ -16,6 +18,14 @@ class Session extends ArrayCollection
     public function start(): static
     {
         session_start(['name' => $_ENV['APP_NAME'] ?? "sid"]);
+        $this->started = true;
+        return $this;
+    }
+
+    public function stop(): static
+    {
+        session_destroy();
+        $this->started = false;
         return $this;
     }
 
@@ -39,4 +49,8 @@ class Session extends ArrayCollection
         parent::add($element);
     }
 
+    public function isStarted(): bool
+    {
+        return $this->started;
+    }
 }
