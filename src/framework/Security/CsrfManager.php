@@ -14,9 +14,14 @@ class CsrfManager
 
     public function generate(string $key = '_token'): string
     {
-        $token = crypt(md5($key), $key);
+        $token = password_hash($key, PASSWORD_BCRYPT);
         $this->session->set($key, $token);
         return $token;
+    }
+
+    public function verify($key, $toVerify): bool
+    {
+        return hash_equals($this->session->get($key), $toVerify);
     }
 
 }
