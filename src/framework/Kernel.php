@@ -59,6 +59,7 @@ class Kernel
         $this->container = new Container();
         ContainerService::containerInit($this->container);
         $this->container->setInstance(__CLASS__, $this);
+        $this->container->setInstance(Session::class, new Session());
         $this->router = new Router();
         return $this;
     }
